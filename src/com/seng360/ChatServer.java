@@ -4,11 +4,12 @@ import com.seng360.ChatInterface;
 
 import java.rmi.*;
 import java.util.*;
+import java.lang.SecurityManager;
 
 public class ChatServer {
     public static void main(String[] args) {
         try {
-            System.setSecurityManager(new RMISecurityManager());
+            System.setSecurityManager(new SecurityManager());
             Scanner s = new Scanner(System.in);
             System.out.println("Enter your name and press enter: ");
             String name = s.nextLine().trim();
