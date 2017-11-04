@@ -11,27 +11,25 @@ import java.util.*;
 import javax.swing.*;
 
 import test.RMIInterface;
+import test.MD5Hash;
 
 public class ClientOperation {
     private static RMIInterface look_up;
 
-    public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
+    public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, FileNotFoundException {
         Scanner s = new Scanner(System.in);
-        //String realPass = "ROCKET";
+        //String realPass = "Rocket";
         String realPass;
-	//bind the server on localhost with the name "MyServer"
-        Scanner f;
-        try {
-            f = new Scanner(new File("ClientPassword.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        MD5Hash hasher = new MD5Hash();
+
+        Scanner f = new Scanner(new File("test/ClientPassword.txt"));
 
         realPass = f.nextLine().trim();
 
+
         look_up = (RMIInterface) Naming.lookup("//localhost/MyServer");
         String name = JOptionPane.showInputDialog("What is your name?");
-        String pass = JOptionPane.showInputDialog("What is your password?");
+        String pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password?"));
         //String pass = JOptionPane("What is your password?");
         int tries = 0;
 
@@ -42,7 +40,7 @@ public class ClientOperation {
                 JOptionPane.showMessageDialog(null, "Groot is upset with you. Wrong Password!!!");
                 return;
             }
-            pass = JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining");
+            pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining"));
             tries++;
         }
 

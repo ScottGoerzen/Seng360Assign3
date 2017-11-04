@@ -1,5 +1,6 @@
 package test;
 
+import java.io.File;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -42,10 +43,16 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
 
             //Scanner s = new Scanner(System.in);
-            String realPass = "GROOT";
+            //String realPass = "GROOT";
+            String realPass;
+            MD5Hash hasher = new MD5Hash();
+
+            Scanner f = new Scanner(new File("test/ServerPassword.txt"));
+
+            realPass = f.nextLine().trim();
 
             //String name = JOptionPane.showInputDialog("What is your name?");
-            String pass = JOptionPane.showInputDialog("What is your password?");
+            String pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password?"));
             //String pass = JOptionPane("What is your password?");
             int tries = 0;
 
@@ -56,7 +63,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                     JOptionPane.showMessageDialog(null, "HOW COULD YOU OFFEND THE GALAXIES. Wrong Password!!!");
                     return;
                 }
-                pass = JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining");
+                pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining"));
                 tries++;
             }
 
