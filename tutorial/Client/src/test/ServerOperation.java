@@ -6,9 +6,10 @@ import java.util.*;
 
 import test.RMIInterface;
 
+import javax.swing.*;
+
 public class ServerOperation extends UnicastRemoteObject implements RMIInterface {
     private static final long serialVersionUID = 1l;
-    private RMIInterfaceClient client;
     private String name;
 
     protected ServerOperation() throws RemoteException {
@@ -39,6 +40,24 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     public static void main(String[] args) {
         try {
             //Scanner s = new Scanner(System.in);
+            String realPass = "GROOT";
+
+            //String name = JOptionPane.showInputDialog("What is your name?");
+            String pass = JOptionPane.showInputDialog("What is your password?");
+            //String pass = JOptionPane("What is your password?");
+            int tries = 0;
+
+            while (pass.compareTo(realPass)!=0) {
+                JOptionPane.showMessageDialog(null, "Wrong Password");
+                if (tries > 4) {
+                    System.out.println("[Server] Connection ended");
+                    JOptionPane.showMessageDialog(null, "HOW COULD YOU OFFEND THE GALAXIES. Wrong Password!!!");
+                    return;
+                }
+                pass = JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining");
+                tries++;
+            }
+
             Naming.rebind("//localhost/MyServer", new ServerOperation());
             System.out.println("Server Ready");
 

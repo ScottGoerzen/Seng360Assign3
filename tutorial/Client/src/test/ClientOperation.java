@@ -20,15 +20,17 @@ public class ClientOperation {
         look_up = (RMIInterface) Naming.lookup("//localhost/MyServer");
         String name = JOptionPane.showInputDialog("What is your name?");
         String pass = JOptionPane.showInputDialog("What is your password?");
+        //String pass = JOptionPane("What is your password?");
         int tries = 0;
 
         while (pass.compareTo(realPass)!=0) {
             JOptionPane.showMessageDialog(null, "Wrong Password");
-            if (tries > 5) {
+            if (tries > 4) {
                 System.out.println("[Server] Connection ended");
+                JOptionPane.showMessageDialog(null, "Groot is upset with you. Wrong Password!!!");
                 return;
             }
-            pass = JOptionPane.showInputDialog("What is your password?");
+            pass = JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining");
             tries++;
         }
 
