@@ -1,5 +1,8 @@
 package test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.rmi.*;
 import java.net.MalformedURLException;
 import java.rmi.server.UnicastRemoteObject;
@@ -14,8 +17,17 @@ public class ClientOperation {
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
         Scanner s = new Scanner(System.in);
-        String realPass = "Groot";
+        //String realPass = "ROCKET";
+        String realPass;
 	//bind the server on localhost with the name "MyServer"
+        Scanner f;
+        try {
+            f = new Scanner(new File("ClientPassword.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        realPass = f.nextLine().trim();
 
         look_up = (RMIInterface) Naming.lookup("//localhost/MyServer");
         String name = JOptionPane.showInputDialog("What is your name?");
