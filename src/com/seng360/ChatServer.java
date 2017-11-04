@@ -3,17 +3,15 @@ package com.seng360;
 import com.seng360.ChatInterface;
 
 import java.rmi.*;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.rmi.registry.*;
 import java.lang.SecurityManager;
 
 public class ChatServer {
     public static void main(String[] args) {
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
+        //if (System.getSecurityManager() == null) {
+          //  System.setSecurityManager(new SecurityManager());
+        //}
 
         try {
             Scanner s = new Scanner(System.in);
@@ -21,22 +19,24 @@ public class ChatServer {
             String name = s.nextLine().trim();
 
             Chat server = new Chat(name);
-
-            Chat stub = (Chat) UnicastRemoteObject.exportObject(server, 10280);
-
-            Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(name, stub);
-
+//System.out.println("Blah");
+            //Chat stub = (Chat) UnicastRemoteObject.exportObject(server, 10029);
+System.out.println("Blah");
+System.out.println("Blah");
+System.out.println("Blah");
+System.out.println("boop");
             /*Object context = null;
             SecurityManager sm = System.getSecurityManager();
             if (sm != null) {
                 context = sm.getSecurityContext();
                 sm.checkAccept("localhost", 10280);
             }*/
+            //LocateRegistry.getRegistry(10280);
+            //Naming.rebind("//localhost/ABC", server);
+            //Naming.rebind("//localhost/ABC", new Chat(name));
+ System.out.println("Hi :)");
 
-            //Naming.rebind("rmi://localhost/ABC", server);
-
-            System.out.println("[System] Chat Remove Object is ready:");
+            System.out.println("[System] Chat Remote Object is ready:");
 
             while (true) {
                 String msg = s.nextLine().trim();

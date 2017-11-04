@@ -9,7 +9,7 @@ import java.util.*;
 public class ChatClient {
     public static void main(String[] args) {
         try {
-            System.setSecurityManager(new SecurityManager());
+            //System.setSecurityManager(new SecurityManager());
             Scanner s = new Scanner(System.in);
             System.out.println("Enter your name and press enter");
             String name = s.nextLine().trim();
