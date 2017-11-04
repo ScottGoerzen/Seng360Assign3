@@ -39,6 +39,8 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
     public static void main(String[] args) {
         try {
+
+
             //Scanner s = new Scanner(System.in);
             String realPass = "GROOT";
 
