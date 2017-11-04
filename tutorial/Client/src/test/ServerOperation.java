@@ -26,7 +26,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     @Override
     public String Msg(String msg, String name) throws RemoteException {
         Scanner s = new Scanner(System.in);
-        System.out.println("[Client "+name+"] " + msg);;
+        System.out.println("[Client: "+name+"] " + msg);;
         String response = "I AM GR";
         for (int i = 0; i < (int)(Math.random()*1000); i++) {
             response += "O";
