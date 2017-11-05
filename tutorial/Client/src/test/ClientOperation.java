@@ -22,21 +22,26 @@ public class ClientOperation {
     private static SecretKeySpec secretKey;
     private static Cipher cipher;
 
+    //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
     public static byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Encrypting string: " + s);
+        //Set Cipher to Encrypt mode in multi step encryption
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
+        //Encryptes string in the final step of the multi step encryption
         byte[] output = cipher.doFinal(s.getBytes());
 
         return output;
     }
 
+    //This method decrypts the passed in byte[] with AES symmetric key and returns the decrypted string
     public static String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Decrypting string: " + s);
+        //Set Cipher to Dercypt mode in multi step encryption
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
+        //Decrypts byte[] in the final step of the multi step decryption
         byte[] output = cipher.doFinal(s);
-
 
         return new String(output);
     }
@@ -47,15 +52,18 @@ public class ClientOperation {
         String realPass;
         MD5Hash hasher = new MD5Hash();
 
+        //Reads real password hash from an access controlled file and stores as realPass
         Scanner f = new Scanner(new File("test/ClientPassword.txt"));
-
         realPass = f.nextLine().trim();
 
-
+        //Finds the server on the ip //localhost/MyServer
         look_up = (RMIInterface) Naming.lookup("//localhost/MyServer");
+
+        //Prompts the client for a name and a password. the Name is just an identifier that is not really cared about
+        //The password is compared to the hash from the file validates the client as the correct person
         String name = JOptionPane.showInputDialog("What is your name?");
         String pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password?"));
-        //String pass = JOptionPane("What is your password?");
+
         int tries = 0;
 
         while (pass.compareTo(realPass)!=0) {
@@ -69,25 +77,30 @@ public class ClientOperation {
             tries++;
         }
 
-        //String response = look_up.helloTo(name);
+        //only progresses in main if the correct password has been entered
+        if (pass.compareTo(realPass)!=0) return;
+
+        //Authenticates with 'handshake' to server and gets a key for AES session key back
         String algorithm = "AES";
         secretKey = look_up.helloTo(name);
         cipher = Cipher.getInstance(algorithm);
-        //System.out.println(response);
-        //JOptionPane.showMessageDialog(null, response);
 
+        //Infinite loop simply waits for client input to send to the server
         while (true) {
             String msg = s.nextLine().trim();
 
+            //If input message is '-Quit' then the client connection is terminated
             if (msg.compareTo("-Quit")==0) {
                 System.out.println("[Server] Connection ended");
                 return;
             }
 
+            //encrypts message typed by client
             byte[] encoded = encryptFile(msg);
 
             //System.out.println("[Message Encrypted] " + new String(encoded));
 
+            //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
             System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
 
         }

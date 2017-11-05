@@ -30,6 +30,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         this.cipher = Cipher.getInstance(algorithm);
     }
 
+    //This method fixes the length of the key for AES encryption to the passed in length (16)
     private byte[] fixSecret(String s, int length) throws UnsupportedEncodingException {
         if (s.length() < length) {
             int missingLength = length - s.length();
@@ -40,43 +41,56 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         return s.substring(0, length).getBytes("UTF-8");
     }
 
-    public byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
+    //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
+    private byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Encrypting string: " + s);
+        //Set Cipher to Encrypt mode in multi step encryption
         this.cipher.init(Cipher.ENCRYPT_MODE, this.secretKey);
-        //Base64.Encoder base64Encoder = Base64.getEncoder();
 
+        //Encryptes string in the final step of the multi step encryption
         byte[] output = this.cipher.doFinal(s.getBytes());
-
-//System.out.println(new String(base64Encoder(output)));
 
         return output;
     }
 
-    public String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
+    //This method decrypts the passed in byte[] with AES symmetric key and returns the decrypted string
+    private String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Decrypting string: " + s);
+        //Set Cipher to Dercypt mode in multi step encryption
         this.cipher.init(Cipher.DECRYPT_MODE, this.secretKey);
-        ;
+
+        //Decrypts byte[] in the final step of the multi step decryption
         byte[] output = this.cipher.doFinal(s);
 
+        //converts byte[] back to a String
         String l = new String(output);
 
         return l;
     }
 
 
+    //This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
     @Override
     public SecretKeySpec helloTo(String name) throws RemoteException {
 
         System.out.println(name + " is trying to contact!");
+
+        //Returns session key for AES encryption/decryption
         return secretKey;
 
     }
 
+    //This method is the main communication between client and server. The client calls this method to pass its msg to the server
+    //where the server decrypts, prints, and then either generatres and automatic response or waits for user input to respond.
     @Override
     public byte[] Msg(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
+
+        //Incoming message is decrypted and printed to the terminal
         System.out.println("[Client: "+name+"] " + decryptFile(msg));
         String response;
+
+        //if auto responses have been enabled, the server generates and automatic string based on a random number of 'O's in the string 'I AM GROOT'
         if (auto) {
             response = "I AM GR";
             for (int i = 0; i < (int) (Math.random() * 1000); i++) {
@@ -85,13 +99,14 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
             response += "T";
 
             System.out.println("[Server] " + response);
+
+        //else the server waits for a user typed input
         } else {
             response = s.nextLine().trim();
         }
 
+        //servers reponse in encrypted before being returned
         byte[] enc = encryptFile(response);
-
-
 
         //System.out.println("[Server Encrypted] " + new String(enc));
 
@@ -105,15 +120,16 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
             String realPass;
             MD5Hash hasher = new MD5Hash();
 
+            //Reads hash of password from access controled file and stores it in the value realPass
             Scanner f = new Scanner(new File("test/ServerPassword.txt"));
-
             realPass = f.nextLine().trim();
 
-            //String name = JOptionPane.showInputDialog("What is your name?");
+            //Prompts user loggin on for a password and hashes input
             String pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password?"));
 
             int tries = 0;
 
+            //while the password has input does not equal the hash read from the file and there are tries left, it promps the user for a new password
             while (pass.compareTo(realPass)!=0) {
                 JOptionPane.showMessageDialog(null, "Wrong Password");
                 if (tries > 4) {
@@ -125,10 +141,15 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                 tries++;
             }
 
+            //only progresses in main if the correct password has been entered
+            if (pass.compareTo(realPass)!=0) return;
+
+            //Creates the server with a secret key and length for AES encryption on the ip //localhost/MyServer
             ServerOperation server = new ServerOperation("!@#$MySecr3tPassw0rd", 16);
             Naming.rebind("//localhost/MyServer", server);
             System.out.println("Server Ready");
 
+            //Prompts user in commandline if they wish to have the server automatically generate responses
             Scanner s = new Scanner(System.in);
             System.out.println("Do you wish to enable auto server responses? (y/n)");
 
