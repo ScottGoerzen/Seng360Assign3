@@ -41,7 +41,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     public byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
-        System.out.println("Encrypting string: " + s);
+        //System.out.println("Encrypting string: " + s);
         this.cipher.init(Cipher.ENCRYPT_MODE, this.secretKey);
         //Base64.Encoder base64Encoder = Base64.getEncoder();
 
@@ -53,14 +53,12 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     public String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
-        System.out.println("Decrypting string: " + s);
+        //System.out.println("Decrypting string: " + s);
         this.cipher.init(Cipher.DECRYPT_MODE, this.secretKey);
         ;
         byte[] output = this.cipher.doFinal(s);
 
         String l = new String(output);
-
-System.out.println(l);
 
         return l;
     }
@@ -85,11 +83,19 @@ System.out.println(l);
                 response += "O";
             }
             response += "T";
+
+            System.out.println("[Server] " + response);
         } else {
             response = s.nextLine().trim();
         }
 
-        return encryptFile(response);
+        byte[] enc = encryptFile(response);
+
+
+
+        //System.out.println("[Server Encrypted] " + new String(enc));
+
+        return enc;
     }
 
     public static void main(String[] args) {
@@ -125,9 +131,11 @@ System.out.println(l);
 
             Scanner s = new Scanner(System.in);
             System.out.println("Do you wish to enable auto server responses? (y/n)");
+
             String res = s.nextLine().toLowerCase().trim();
-            if (res.compareTo("y")==0) server.auto = true;
-            else server.auto = false;
+            if (res.compareTo("y") == 0) server.auto = true;
+            else if (res.compareTo("n")==0) server.auto = false;
+
 
 
 

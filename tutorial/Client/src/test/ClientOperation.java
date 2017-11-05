@@ -23,7 +23,7 @@ public class ClientOperation {
     private static Cipher cipher;
 
     public static byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
-        System.out.println("Encrypting string: " + s);
+        //System.out.println("Encrypting string: " + s);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
         byte[] output = cipher.doFinal(s.getBytes());
@@ -32,7 +32,7 @@ public class ClientOperation {
     }
 
     public static String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
-        System.out.println("Decrypting string: " + s);
+        //System.out.println("Decrypting string: " + s);
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
         byte[] output = cipher.doFinal(s);
@@ -81,9 +81,12 @@ public class ClientOperation {
 
             if (msg.compareTo("-Quit")==0) {
                 System.out.println("[Server] Connection ended");
+                return;
             }
 
             byte[] encoded = encryptFile(msg);
+
+            //System.out.println("[Message Encrypted] " + new String(encoded));
 
             System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
 
