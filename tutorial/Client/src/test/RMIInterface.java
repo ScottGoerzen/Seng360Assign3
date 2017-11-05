@@ -1,9 +1,14 @@
 package test;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.rmi.*;
+import java.security.InvalidKeyException;
 
 
 public interface RMIInterface extends Remote {
-    public String helloTo (String name) throws RemoteException;
-    public String Msg (String msg, String name) throws RemoteException;
+    public SecretKeySpec helloTo (String name) throws RemoteException;
+    public byte[] Msg (byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
 }

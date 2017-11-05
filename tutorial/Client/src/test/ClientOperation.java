@@ -1,12 +1,16 @@
 package test;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.io.FileNotFoundException;
 import java.rmi.*;
 import java.net.MalformedURLException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import javax.crypto.*;
+import java.security.*;
+import javax.crypto.spec.SecretKeySpec;
+
 
 import javax.swing.*;
 
@@ -15,8 +19,29 @@ import test.MD5Hash;
 
 public class ClientOperation {
     private static RMIInterface look_up;
+    private static SecretKeySpec secretKey;
+    private static Cipher cipher;
 
-    public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, FileNotFoundException {
+    public static byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
+        System.out.println("Encrypting string: " + s);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        byte[] output = cipher.doFinal(s.getBytes());
+
+        return output;
+    }
+
+    public static String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
+        System.out.println("Decrypting string: " + s);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        byte[] output = cipher.doFinal(s);
+
+
+        return new String(output);
+    }
+
+    public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
         Scanner s = new Scanner(System.in);
         //String realPass = "Rocket";
         String realPass;
@@ -44,8 +69,11 @@ public class ClientOperation {
             tries++;
         }
 
-        String response = look_up.helloTo(name);
-        System.out.println(response);
+        //String response = look_up.helloTo(name);
+        String algorithm = "AES";
+        secretKey = look_up.helloTo(name);
+        cipher = Cipher.getInstance(algorithm);
+        //System.out.println(response);
         //JOptionPane.showMessageDialog(null, response);
 
         while (true) {
@@ -55,7 +83,10 @@ public class ClientOperation {
                 System.out.println("[Server] Connection ended");
             }
 
-            System.out.println("[Server] " + look_up.Msg(msg, name));
+            byte[] encoded = encryptFile(msg);
+
+            System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
+
         }
 
 

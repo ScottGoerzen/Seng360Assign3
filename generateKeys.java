@@ -6,13 +6,24 @@ import java.io.*;
 public class generateKeys
 {
    public static void main(String []args) throws Exception {
-      KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-      kpg.initialize(1024);
-      KeyPair kp = kpg.genKeyPair();
+      //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+
+      //KeyPair kp = kpg.genKeyPair();
+
+      KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+      SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+      keyGen.initialize(2048, random);
+
+      KeyPair pair = keyGen.generateKeyPair();
+      PrivateKey priv = pair.getPrivate();
+      PublicKey pub = pair.getPublic();
+
   
-      byte[] publicKey = kp.getPublic().getEncoded();
-      byte[] privateKey = kp.getPrivate().getEncoded();
-  
+      byte[] publicKey = pub.getEncoded();
+      byte[] privateKey = priv.getEncoded();
+
+
+
       FileOutputStream fos = new FileOutputStream("public.key");
       fos.write(publicKey);
       fos.close();
