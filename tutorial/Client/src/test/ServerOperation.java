@@ -27,8 +27,8 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     protected ServerOperation(String secret, int length) throws RemoteException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException {
         super();
 
-        hasClient = false;
-
+        //hasClient = false;
+System.out.println("Im here");
         byte[] key = new byte[length];
         String algorithm = "AES";
         key = fixSecret(secret, length);
@@ -121,10 +121,10 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         //return enc;
     }
 
-    @Override
+   /* @Override
     public void Msg(String msg) {
         System.out.println("[Server] " + msg);
-    }
+    }*/
 
     public static void main(String[] args) {
         try {
