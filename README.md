@@ -5,20 +5,20 @@ This Program runs using 3 terminal windows.
 
 First open all windows to the tutorial/Client/src folder and run 
 
-	*rmiregistry \<unused port\>*
+	rmiregistry <unused port>
 
 On another terminal compile all files with the command 
 
-	*javac test/RMIInterface/java test/RMICInterface.java test/ClientOperation.java test/ServerOperation.java*
+	javac test/RMIInterface/java test/RMICInterface.java test/ClientOperation.java test/ServerOperation.java
 
 On the same window run 
 
-	*java test/ServerOperation*
+	java test/ServerOperation
 and enter the password 'GROOT' before selecting the desired security options.
 
 On the last window run 
 
-	*java test/ClientOperation* 
+	java test/ClientOperation 
 
 and enter a arbitrary Username and the password 'Rocket' to authenticate the user before selecting the desired security options.
 
@@ -30,10 +30,15 @@ If this order is not followed, and error connecting to the client will arise.
 You can now type freely as the Client or Server to send messages to the other party.
 
 Security options can be changed by typing a '-' followed by a command into the imput field.
+
 Commands include:
+
 	-ct	: Confidentiality true : Turns on encryption of outgoing messages
+
 	-cf	: Confidentiality false : Turns off encryption of outgoing messages
+
 	-it 	: Integrity Checks enabled : Turns on checking of message integrity via message authentication codes (MAC)
+
 	-if 	: Integrity Checks disabled : Turns off checking of message integrity via message authentication codes (MAC)
 
 Both security options are enabled by default, but are selectable and set by the initiation sequence in the menu feature.
