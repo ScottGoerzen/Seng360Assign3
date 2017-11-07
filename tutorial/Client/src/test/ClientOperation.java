@@ -24,8 +24,14 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     private static SecretKeySpec secretKey;
     private static Cipher cipher;
 
+    private boolean[] params;
+    private static int numParams = 1;
+
     protected ClientOperation () throws RemoteException {
         super();
+
+        params = new boolean[numParams];
+        params[0] = true;
     }
 
 
@@ -41,7 +47,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     @Override
     public void MsgENC(byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
-
+System.out.println("Encrypted:: "+msg);
         //Incoming message is decrypted and printed to the terminal
         System.out.println("[Server] " + decryptFile(msg));
         //String response;
@@ -56,10 +62,10 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //return enc;
     }
 
-    /*@Override
+    @Override
     public void Msg(String msg) {
         System.out.println("[Server] " + msg);
-    }*/
+    }
 
     //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
     public static byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
@@ -139,6 +145,12 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             if (msg.compareTo("-Quit")==0) {
                 System.out.println("[Server] Connection ended");
                 return;
+            } else if (msg.compareTo("false")==0) {
+                client.params[0] = false;
+                continue;
+            } else if (msg.compareTo("true")==0) {
+                client.params[0] = true;
+                continue;
             }
 
             //encrypts message typed by client
@@ -148,7 +160,8 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
             //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
             //System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
-            look_up.MsgENC(encoded, name);
+            if (client.params[0]) look_up.MsgENC(encoded, name);
+            else if (!client.params[0]) look_up.Msg(msg);
 
         }
 

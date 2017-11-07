@@ -12,13 +12,16 @@ import test.RMIInterface;
 
 import javax.swing.*;
 
+
+
 public class ServerOperation extends UnicastRemoteObject implements RMIInterface {
     private static final long serialVersionUID = 1l;
     private static RMICInterface look_up;
     public boolean auto;
     private String name;
 
-    private boolean hasClient;
+    private boolean[] params;
+    private static int numParams = 1;
 
     //AES crypto stuff
     private SecretKeySpec secretKey;
@@ -27,8 +30,9 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     protected ServerOperation(String secret, int length) throws RemoteException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException {
         super();
 
-        //hasClient = false;
-System.out.println("Im here");
+        params = new boolean[this.numParams];
+        params[0] = true;
+
         byte[] key = new byte[length];
         String algorithm = "AES";
         key = fixSecret(secret, length);
@@ -81,7 +85,6 @@ System.out.println("Im here");
 
         System.out.println(name + " is trying to contact!");
 
-        hasClient = true;
 
         //Returns session key for AES encryption/decryption
         return secretKey;
@@ -93,7 +96,7 @@ System.out.println("Im here");
     @Override
     public void MsgENC(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
-
+System.out.println("Encrypted:: "+msg);
         //Incoming message is decrypted and printed to the terminal
         System.out.println("[Client: "+name+"] " + decryptFile(msg));
         /* String response;
@@ -121,10 +124,10 @@ System.out.println("Im here");
         //return enc;
     }
 
-   /* @Override
+    @Override
     public void Msg(String msg) {
         System.out.println("[Server] " + msg);
-    }*/
+    }
 
     public static void main(String[] args) {
         try {
@@ -180,6 +183,12 @@ System.out.println("Im here");
                 if (text.compareTo("-Quit")==0) {
                     System.out.println("[Server] Connection ended");
                     break;
+                } else if (text.compareTo("false")==0) {
+                    server.params[0] = false;
+                    continue;
+                } else if (text.compareTo("true")==0) {
+                    server.params[0] = true;
+                    continue;
                 }
 
                 //encrypts message typed by client
@@ -190,7 +199,8 @@ System.out.println("Im here");
                 //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
                 //System.out.println("[Client "+server.name+":] " + server.decryptFile(look_up.Msg(encoded)));
 
-                look_up.MsgENC(encoded);
+                if (server.params[0]) look_up.MsgENC(encoded);
+                else if (!server.params[0]) look_up.Msg(text);
 
             }
 

@@ -10,5 +10,5 @@ import java.security.InvalidKeyException;
 public interface RMICInterface extends Remote {
     public String helloTo (String name) throws RemoteException;
     public void MsgENC (byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
-   // public void Msg (String msg);
+    public void Msg (String msg) throws RemoteException;
 }
