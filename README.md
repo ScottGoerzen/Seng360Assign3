@@ -25,7 +25,7 @@ and enter a arbitrary Username and the password 'Rocket' to authenticate the use
 *Note that the server must be run first, and the client to follow before typing somthing into the server field to indicate readiness*
 
 Next type a affirmative response into the Server console to indicate the Client is ready. -> this action serves to hold the server operation until the client has been established before trying to connect. 
-If this order is not followed, and error connecting to the client will arise.
+If this order is not followed, an error connecting to the client will arise.
 
 You can now type freely as the Client or Server to send messages to the other party.
 
