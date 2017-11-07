@@ -3,15 +3,21 @@ Assignment 3 For Seng 360 Fall 2017
 
 This Program runs using 3 terminal windows.
 
-First open all windows to the tutorial/Client/src folder and run "rmiregistry \<unused port\>"
+First open all windows to the tutorial/Client/src folder and run 
+	rmiregistry \<unused port\>
 
-On another terminal compile all files with the command "javac test/RMIInterface/java test/RMICInterface.java test/ClientOperation.java test/ServerOperation.java"
+On another terminal compile all files with the command 
+	javac test/RMIInterface/java test/RMICInterface.java test/ClientOperation.java test/ServerOperation.java
 
-On the same window run "java test/ServerOperation" and enter the password 'GROOT' before selecting the desired security options.
+On the same window run 
+	java test/ServerOperation 
+and enter the password 'GROOT' before selecting the desired security options.
 
-On the last window run "java test/ClientOperation" and enter a arbitrary Username and the password 'Rocket' to authenticate the user before selecting the desired security options.
+On the last window run 
+	java test/ClientOperation 
+and enter a arbitrary Username and the password 'Rocket' to authenticate the user before selecting the desired security options.
 
-	*Note that the server must be run first, and the client to follow before typing somthing into the server field to indicate readiness*
+*Note that the server must be run first, and the client to follow before typing somthing into the server field to indicate readiness*
 
 Next type a affirmative response into the Server console to indicate the Client is ready. -> this action serves to hold the server operation until the client has been established before trying to connect. 
 If this order is not followed, and error connecting to the client will arise.
