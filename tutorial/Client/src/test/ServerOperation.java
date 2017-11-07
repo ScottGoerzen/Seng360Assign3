@@ -14,8 +14,11 @@ import javax.swing.*;
 
 public class ServerOperation extends UnicastRemoteObject implements RMIInterface {
     private static final long serialVersionUID = 1l;
+    private static RMICInterface look_up;
     public boolean auto;
     private String name;
+
+    private boolean hasClient;
 
     //AES crypto stuff
     private SecretKeySpec secretKey;
@@ -23,6 +26,9 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
     protected ServerOperation(String secret, int length) throws RemoteException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException {
         super();
+
+        hasClient = false;
+
         byte[] key = new byte[length];
         String algorithm = "AES";
         key = fixSecret(secret, length);
@@ -75,6 +81,8 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
         System.out.println(name + " is trying to contact!");
 
+        hasClient = true;
+
         //Returns session key for AES encryption/decryption
         return secretKey;
 
@@ -83,15 +91,15 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     //This method is the main communication between client and server. The client calls this method to pass its msg to the server
     //where the server decrypts, prints, and then either generatres and automatic response or waits for user input to respond.
     @Override
-    public byte[] Msg(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    public void Msg(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
 
         //Incoming message is decrypted and printed to the terminal
         System.out.println("[Client: "+name+"] " + decryptFile(msg));
-        String response;
+        /* String response;
 
         //if auto responses have been enabled, the server generates and automatic string based on a random number of 'O's in the string 'I AM GROOT'
-        if (auto) {
+       if (auto) {
             response = "I AM GR";
             for (int i = 0; i < (int) (Math.random() * 1000); i++) {
                 response += "O";
@@ -102,15 +110,15 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
         //else the server waits for a user typed input
         } else {
-            response = s.nextLine().trim();
+            //response = s.nextLine().trim();
         }
 
         //servers reponse in encrypted before being returned
-        byte[] enc = encryptFile(response);
+        byte[] enc = encryptFile(response);*/
 
         //System.out.println("[Server Encrypted] " + new String(enc));
 
-        return enc;
+        //return enc;
     }
 
     public static void main(String[] args) {
@@ -147,17 +155,39 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
             //Creates the server with a secret key and length for AES encryption on the ip //localhost/MyServer
             ServerOperation server = new ServerOperation("!@#$MySecr3tPassw0rd", 16);
             Naming.rebind("//localhost/MyServer", server);
-            System.out.println("Server Ready");
+            System.out.println("[System] Server Ready");
 
             //Prompts user in commandline if they wish to have the server automatically generate responses
             Scanner s = new Scanner(System.in);
-            System.out.println("Do you wish to enable auto server responses? (y/n)");
+            System.out.println("You Ready?");
 
             String res = s.nextLine().toLowerCase().trim();
-            if (res.compareTo("y") == 0) server.auto = true;
-            else if (res.compareTo("n")==0) server.auto = false;
+            //if (res.compareTo("y") == 0) server.auto = true;
+            //else if (res.compareTo("n")==0) server.auto = false;
+            //while (!server.hasClient);
 
+            look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
 
+            while (true) {
+                String text = s.nextLine().trim();
+
+                //If input message is '-Quit' then the client connection is terminated
+                if (text.compareTo("-Quit")==0) {
+                    System.out.println("[Server] Connection ended");
+                    break;
+                }
+
+                //encrypts message typed by client
+                byte[] encoded = server.encryptFile(text);
+
+                //System.out.println("[Message Encrypted] " + new String(encoded));
+
+                //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
+                //System.out.println("[Client "+server.name+":] " + server.decryptFile(look_up.Msg(encoded)));
+
+                look_up.Msg(encoded);
+
+            }
 
 
         } catch (Exception e) {

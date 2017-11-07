@@ -15,12 +15,46 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 
 import test.RMIInterface;
+import test.RMICInterface;
 import test.MD5Hash;
 
-public class ClientOperation {
+public class ClientOperation extends UnicastRemoteObject implements RMICInterface {
+    private static final long serialVersionUID = 1l;
     private static RMIInterface look_up;
     private static SecretKeySpec secretKey;
     private static Cipher cipher;
+
+    protected ClientOperation () throws RemoteException {
+        super();
+    }
+
+
+    @Override
+    public String helloTo(String name) throws RemoteException {
+
+        System.out.println(name + " is trying to contact!");
+
+        return "hi";
+
+    }
+
+    @Override
+    public void Msg(byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        Scanner s = new Scanner(System.in);
+
+        //Incoming message is decrypted and printed to the terminal
+        System.out.println("[Server] " + decryptFile(msg));
+        //String response;
+
+        //response = s.nextLine().trim();
+
+        //servers reponse in encrypted before being returned
+        //byte[] enc = encryptFile(response);
+
+        //System.out.println("[Server Encrypted] " + new String(enc));
+
+        //return enc;
+    }
 
     //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
     public static byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
@@ -80,10 +114,17 @@ public class ClientOperation {
         //only progresses in main if the correct password has been entered
         if (pass.compareTo(realPass)!=0) return;
 
+
+
         //Authenticates with 'handshake' to server and gets a key for AES session key back
         String algorithm = "AES";
         secretKey = look_up.helloTo(name);
         cipher = Cipher.getInstance(algorithm);
+
+        ClientOperation client = new ClientOperation();
+
+        Naming.rebind("//localhost/MyClient", client);
+        System.out.println("[System] Client Ready");
 
         //Infinite loop simply waits for client input to send to the server
         while (true) {
@@ -101,7 +142,8 @@ public class ClientOperation {
             //System.out.println("[Message Encrypted] " + new String(encoded));
 
             //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
-            System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
+            //System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
+            look_up.Msg(encoded, name);
 
         }
 
