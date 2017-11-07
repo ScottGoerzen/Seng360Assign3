@@ -50,6 +50,9 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 System.out.println("Encrypted:: "+msg);
         //Incoming message is decrypted and printed to the terminal
         System.out.println("[Server] " + decryptFile(msg));
+       // System.out.print("> ");
+
+
         //String response;
 
         //response = s.nextLine().trim();
@@ -65,6 +68,9 @@ System.out.println("Encrypted:: "+msg);
     @Override
     public void Msg(String msg) {
         System.out.println("[Server] " + msg);
+        //System.out.print("> ");
+
+
     }
 
     //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
@@ -139,11 +145,13 @@ System.out.println("Encrypted:: "+msg);
 
         //Infinite loop simply waits for client input to send to the server
         while (true) {
+            //System.out.print("> ");
+
             String msg = s.nextLine().trim();
 
             //If input message is '-Quit' then the client connection is terminated
             if (msg.compareTo("-Quit")==0) {
-                System.out.println("[Server] Connection ended");
+                System.out.println("[System] Connection ended");
                 return;
             } else if (msg.compareTo("false")==0) {
                 client.params[0] = false;

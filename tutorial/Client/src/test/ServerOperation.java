@@ -177,11 +177,13 @@ System.out.println("Encrypted:: "+msg);
             look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
 
             while (true) {
+                //System.out.print("> ");
+
                 String text = s.nextLine().trim();
 
                 //If input message is '-Quit' then the client connection is terminated
                 if (text.compareTo("-Quit")==0) {
-                    System.out.println("[Server] Connection ended");
+                    System.out.println("[System] Connection ended");
                     break;
                 } else if (text.compareTo("false")==0) {
                     server.params[0] = false;
