@@ -21,7 +21,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     private String name;
 
     private boolean[] params;
-    private static int numParams = 1;
+    private static int numParams = 3;
 
     //AES crypto stuff
     private SecretKeySpec secretKey;
@@ -31,7 +31,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         super();
 
         params = new boolean[this.numParams];
-        params[0] = true;
+        params[0] = true; params[1] = true; params[2] = true;
 
         byte[] key = new byte[length];
         String algorithm = "AES";
@@ -165,6 +165,34 @@ System.out.println("Encrypted:: "+msg);
             Naming.rebind("//localhost/MyServer", server);
             System.out.println("[System] Server Ready");
 
+            //Options menu for selection security options
+            int choice = -2;
+            while (choice != -1) {
+                String[] options = { "Confidentiality: "+server.params[0], "Integrity: "+server.params[1], "Availability: "+server.params[2], "Done" };
+                choice = JOptionPane.showOptionDialog(null, "Select server paramaters", "Options", 0,
+                        JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+                switch (choice) {
+                    case 0:
+                        if (server.params[0])server.params[0] = false;
+                        else server.params[0] = true;
+                        break;
+                    case 1:
+                        if (server.params[1])server.params[1] = false;
+                        else server.params[1] = true;
+                        break;
+                    case 2:
+                        if (server.params[2])server.params[2] = false;
+                        else server.params[2] = true;
+                        break;
+                    case 3:
+                        choice = -1;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             //Prompts user in commandline if they wish to have the server automatically generate responses
             Scanner s = new Scanner(System.in);
             System.out.println("You Ready?");
@@ -185,13 +213,25 @@ System.out.println("Encrypted:: "+msg);
                 if (text.compareTo("-Quit")==0) {
                     System.out.println("[System] Connection ended");
                     break;
-                } else if (text.compareTo("false")==0) {
+                } else if (text.compareTo("-cf")==0) {
                     server.params[0] = false;
                     continue;
-                } else if (text.compareTo("true")==0) {
+                } else if (text.compareTo("-ct")==0) {
                     server.params[0] = true;
                     continue;
-                }
+                } /*else if (text.compareTo("-if")==0) {
+                    server.params[1] = false;
+                    continue;
+                } else if (text.compareTo("-it")==0) {
+                    server.params[1] = true;
+                    continue;
+                } else if (text.compareTo("-af")==0) {
+                    server.params[2] = false;
+                    continue;
+                } else if (text.compareTo("-at")==0) {
+                    server.params[2] = true;
+                    continue;
+                }*/
 
                 //encrypts message typed by client
                 byte[] encoded = server.encryptFile(text);

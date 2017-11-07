@@ -25,13 +25,13 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     private static Cipher cipher;
 
     private boolean[] params;
-    private static int numParams = 1;
+    private static int numParams = 3;
 
     protected ClientOperation () throws RemoteException {
         super();
 
         params = new boolean[numParams];
-        params[0] = true;
+        params[0] = true; params[1] = true; params[2] = true;
     }
 
 
@@ -143,6 +143,34 @@ System.out.println("Encrypted:: "+msg);
         Naming.rebind("//localhost/MyClient", client);
         System.out.println("[System] Client Ready");
 
+        //Options menu for selection security options
+        int choice = -2;
+        while (choice != -1) {
+            String[] options = { "Confidentiality: "+client.params[0], "Integrity: "+client.params[1], "Availability: "+client.params[2], "Done" };
+            choice = JOptionPane.showOptionDialog(null, "Select client paramaters", "Options", 0,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+            switch (choice) {
+                case 0:
+                    if (client.params[0])client.params[0] = false;
+                    else client.params[0] = true;
+                    break;
+                case 1:
+                    if (client.params[1])client.params[1] = false;
+                    else client.params[1] = true;
+                    break;
+                case 2:
+                    if (client.params[2])client.params[2] = false;
+                    else client.params[2] = true;
+                    break;
+                case 3:
+                    choice = -1;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         //Infinite loop simply waits for client input to send to the server
         while (true) {
             //System.out.print("> ");
@@ -153,13 +181,25 @@ System.out.println("Encrypted:: "+msg);
             if (msg.compareTo("-Quit")==0) {
                 System.out.println("[System] Connection ended");
                 return;
-            } else if (msg.compareTo("false")==0) {
+            } else if (msg.compareTo("-cf")==0) {
                 client.params[0] = false;
                 continue;
-            } else if (msg.compareTo("true")==0) {
+            } else if (msg.compareTo("-ct")==0) {
                 client.params[0] = true;
                 continue;
-            }
+            } /*else if (msg.compareTo("-if")==0) {
+                client.params[1] = false;
+                continue;
+            } else if (msg.compareTo("-it")==0) {
+                client.params[1] = true;
+                continue;
+            } else if (msg.compareTo("-af")==0) {
+                client.params[2] = false;
+                continue;
+            } else if (msg.compareTo("-at")==0) {
+                client.params[2] = true;
+                continue;
+            }*/
 
             //encrypts message typed by client
             byte[] encoded = encryptFile(msg);
