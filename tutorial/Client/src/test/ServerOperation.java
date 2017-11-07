@@ -91,6 +91,34 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
     }
 
+    public String MAC(String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        MD5Hash hasher = new MD5Hash();
+        msg = hasher.md5Hash(msg);
+        return new String(encryptFile(msg));
+    }
+
+    @Override
+    public void MsgINT(String mac, String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        String verify = MAC(msg);
+        if (mac.compareTo(verify)==0) System.out.println("[Server] " + msg);
+        else {
+            System.out.println("[ERROR] MESSAGE INTEGRITY COMPROMISED!");
+            System.out.println("[Server] " + msg);
+        }
+    }
+
+    @Override
+    public void MsgINTENC(String mac, byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        String text = decryptFile(msg);
+        String verify = MAC(text);
+        if (mac.compareTo(verify)==0) System.out.println("[Server] " + text);
+        else {
+            System.out.println("[ERROR] MESSAGE INTEGRITY COMPROMISED!");
+            System.out.println("[Server] " + text);
+        }
+    }
+
+
     //This method is the main communication between client and server. The client calls this method to pass its msg to the server
     //where the server decrypts, prints, and then either generatres and automatic response or waits for user input to respond.
     @Override

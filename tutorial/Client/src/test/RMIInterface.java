@@ -12,4 +12,6 @@ public interface RMIInterface extends Remote {
     public SecretKeySpec helloTo (String name) throws RemoteException;
     public void MsgENC (byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
     public void Msg (String msg) throws RemoteException;
+    public void MsgINT (String mac, String msg) throws RemoteException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
+    public void MsgINTENC (String mac, byte[] msg) throws RemoteException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
 }

@@ -44,6 +44,33 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
     }
 
+    public String MAC(String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        MD5Hash hasher = new MD5Hash();
+        msg = hasher.md5Hash(msg);
+        return new String(encryptFile(msg));
+    }
+
+    @Override
+    public void MsgINT(String mac, String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        String verify = MAC(msg);
+        if (mac.compareTo(verify)==0) System.out.println("[Server] " + msg);
+        else {
+            System.out.println("[ERROR] MESSAGE INTEGRITY COMPROMISED!");
+            System.out.println("[Server] " + msg);
+        }
+    }
+
+    @Override
+    public void MsgINTENC(String mac, byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        String text = decryptFile(msg);
+        String verify = MAC(text);
+        if (mac.compareTo(verify)==0) System.out.println("[Server] " + text);
+        else {
+            System.out.println("[ERROR] MESSAGE INTEGRITY COMPROMISED!");
+            System.out.println("[Server] " + text);
+        }
+    }
+
     @Override
     public void MsgENC(byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
@@ -203,13 +230,17 @@ System.out.println("Encrypted:: "+msg);
 
             //encrypts message typed by client
             byte[] encoded = encryptFile(msg);
+            String maced = client.MAC(msg);
 
-            //System.out.println("[Message Encrypted] " + new String(encoded));
+            //sends message to the server with selected security properties
 
-            //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
             //System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
-            if (client.params[0]) look_up.MsgENC(encoded, name);
-            else if (!client.params[0]) look_up.Msg(msg);
+            /*if(client.params[0] && client.params[1] && client.params[2]);
+            else*/ if (client.params[0] && client.params[1]) look_up.MsgINTENC(maced, encoded);
+            else if (client.params[0]) look_up.MsgENC(encoded, name);
+            else if (client.params[1]) look_up.MsgINT(maced, msg);
+            //else if (client.params[2]);
+            else look_up.Msg(msg);
 
         }
 
