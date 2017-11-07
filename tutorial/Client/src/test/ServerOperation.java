@@ -91,7 +91,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     //This method is the main communication between client and server. The client calls this method to pass its msg to the server
     //where the server decrypts, prints, and then either generatres and automatic response or waits for user input to respond.
     @Override
-    public void Msg(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    public void MsgENC(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
 
         //Incoming message is decrypted and printed to the terminal
@@ -185,7 +185,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                 //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
                 //System.out.println("[Client "+server.name+":] " + server.decryptFile(look_up.Msg(encoded)));
 
-                look_up.Msg(encoded);
+                look_up.MsgENC(encoded);
 
             }
 

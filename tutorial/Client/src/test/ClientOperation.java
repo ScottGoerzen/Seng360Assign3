@@ -39,7 +39,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     }
 
     @Override
-    public void Msg(byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    public void MsgENC(byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
 
         //Incoming message is decrypted and printed to the terminal
@@ -143,7 +143,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
             //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
             //System.out.println("[Server] " + decryptFile(look_up.Msg(encoded, name)));
-            look_up.Msg(encoded, name);
+            look_up.MsgENC(encoded, name);
 
         }
 
