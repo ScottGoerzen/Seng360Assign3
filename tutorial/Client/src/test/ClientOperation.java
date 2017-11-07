@@ -56,6 +56,11 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //return enc;
     }
 
+    @Override
+    public void Msg(String msg) {
+        System.out.println("[Server] " + msg);
+    }
+
     //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
     public static byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Encrypting string: " + s);

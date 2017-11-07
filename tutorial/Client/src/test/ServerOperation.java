@@ -121,6 +121,11 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         //return enc;
     }
 
+    @Override
+    public void Msg(String msg) {
+        System.out.println("[Server] " + msg);
+    }
+
     public static void main(String[] args) {
         try {
 
