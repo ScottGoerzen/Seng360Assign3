@@ -29,7 +29,7 @@ If this order is not followed, an error connecting to the client will arise.
 
 You can now type freely as the Client or Server to send messages to the other party.
 
-Security options can be changed by typing a '-' followed by a command into the imput field.
+Security options can be changed by typing a '-' followed by a command into the input field.
 
 Commands include:
 
@@ -43,11 +43,11 @@ Commands include:
 
 Both security options are enabled by default, but are selectable and set by the initiation sequence in the menu feature.
 
-Authorization is checked at login on both Server and Client side by means of comparing the hash of the input password to the hash saved in a access controlled directory.
+Authorization is checked at login on both Server and Client side by means of comparing the hash of the input password to the hash saved in an access controlled directory.
 
-When the client and the server connect to each other, they send a authenication message via public/private keys in asymmetric cryptograpy and when the client contacts the server, a session key esstablished by symmetric cryptography with AES is returned.
+When the client and the server connect to each other, they send a authenication message via public/private keys in asymmetric cryptograpy and when the client contacts the server, a session key established for symmetric cryptography with AES is returned.
 
-All later encryption is done by AES encryption and the session key established at the first step.
+All later encryption is done by AES encryption with the session key established at the first step.
 
 Hashing is done via the MD5 hashing scheme.
 
