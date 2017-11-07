@@ -15,6 +15,7 @@ and enter the password 'GROOT' before selecting the desired security options.
 
 On the last window run 
 	*java test/ClientOperation* 
+
 and enter a arbitrary Username and the password 'Rocket' to authenticate the user before selecting the desired security options.
 
 *Note that the server must be run first, and the client to follow before typing somthing into the server field to indicate readiness*
