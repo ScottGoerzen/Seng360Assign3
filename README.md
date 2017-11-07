@@ -3,7 +3,7 @@ Assignment 3 For Seng 360 Fall 2017
 
 This Program runs using 3 terminal windows.
 
-First open all windows to the tutorial/Client/src folder and run "rmiregistry <unused port>"
+First open all windows to the tutorial/Client/src folder and run "rmiregistry \<unused port\>"
 
 On another terminal compile all files with the command "javac test/RMIInterface/java test/RMICInterface.java test/ClientOperation.java test/ServerOperation.java"
 
