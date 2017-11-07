@@ -17,11 +17,10 @@ import javax.swing.*;
 public class ServerOperation extends UnicastRemoteObject implements RMIInterface {
     private static final long serialVersionUID = 1l;
     private static RMICInterface look_up;
-    public boolean auto;
     private String name;
 
     private boolean[] params;
-    private static int numParams = 3;
+    private static int numParams = 2;
 
     //AES crypto stuff
     private SecretKeySpec secretKey;
@@ -31,7 +30,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         super();
 
         params = new boolean[this.numParams];
-        params[0] = true; params[1] = true; params[2] = true;
+        params[0] = true; params[1] = true;
 
         byte[] key = new byte[length];
         String algorithm = "AES";
@@ -84,6 +83,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     public SecretKeySpec helloTo(String name) throws RemoteException {
 
         System.out.println(name + " is trying to contact!");
+        this.name = name;
 
 
         //Returns session key for AES encryption/decryption
@@ -91,30 +91,34 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
     }
 
+    //Message authentication code generator. Takes in a string, hashes the string, encrypts, then converts that to a string.
     public String MAC(String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         MD5Hash hasher = new MD5Hash();
         msg = hasher.md5Hash(msg);
         return new String(encryptFile(msg));
     }
 
+    //Recieves a message with integrity checks. Runs the incoming msg through the MAC generator and compares the output to that of
+    //the MAC that was given by the message sender
     @Override
     public void MsgINT(String mac, String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         String verify = MAC(msg);
-        if (mac.compareTo(verify)==0) System.out.println("[Server] " + msg);
+        if (mac.compareTo(verify)==0) System.out.println("[Client: "+name+"] " + msg+" [Integrity Checked]");
         else {
             System.out.println("[ERROR] MESSAGE INTEGRITY COMPROMISED!");
-            System.out.println("[Server] " + msg);
+            System.out.println("[Client: "+name+"] " + msg+" [Integrity Failed]");
         }
     }
 
+    //Recieves a message with integrity checks and encryption for confidentiality. Decrypts message, then verifies integrity against MAC
     @Override
     public void MsgINTENC(String mac, byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         String text = decryptFile(msg);
         String verify = MAC(text);
-        if (mac.compareTo(verify)==0) System.out.println("[Server] " + text);
+        if (mac.compareTo(verify)==0) System.out.println("[Client: "+name+"] " + text+" [Integrity Checked and Confidential]");
         else {
             System.out.println("[ERROR] MESSAGE INTEGRITY COMPROMISED!");
-            System.out.println("[Server] " + text);
+            System.out.println("[Client: "+name+"] " + text+" [Integrity Failed but Confidential]");
         }
     }
 
@@ -124,37 +128,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     @Override
     public void MsgENC(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
-System.out.println("Encrypted:: "+msg);
         //Incoming message is decrypted and printed to the terminal
-        System.out.println("[Client: "+name+"] " + decryptFile(msg));
-        /* String response;
-
-        //if auto responses have been enabled, the server generates and automatic string based on a random number of 'O's in the string 'I AM GROOT'
-       if (auto) {
-            response = "I AM GR";
-            for (int i = 0; i < (int) (Math.random() * 1000); i++) {
-                response += "O";
-            }
-            response += "T";
-
-            System.out.println("[Server] " + response);
-
-        //else the server waits for a user typed input
-        } else {
-            //response = s.nextLine().trim();
-        }
-
-        //servers reponse in encrypted before being returned
-        byte[] enc = encryptFile(response);*/
-
-        //System.out.println("[Server Encrypted] " + new String(enc));
-
-        //return enc;
+        System.out.println("[Client: "+name+"] " + decryptFile(msg)+" [Confidential]");
     }
 
     @Override
     public void Msg(String msg) {
-        System.out.println("[Server] " + msg);
+        System.out.println("[Client: "+name+"] " + msg);
     }
 
     public static void main(String[] args) {
@@ -162,9 +142,9 @@ System.out.println("Encrypted:: "+msg);
 
             //String realPass = "GROOT";
             String realPass;
-            MD5Hash hasher = new MD5Hash();
 
             //Reads hash of password from access controled file and stores it in the value realPass
+            MD5Hash hasher = new MD5Hash();
             Scanner f = new Scanner(new File("test/ServerPassword.txt"));
             realPass = f.nextLine().trim();
 
@@ -196,7 +176,7 @@ System.out.println("Encrypted:: "+msg);
             //Options menu for selection security options
             int choice = -2;
             while (choice != -1) {
-                String[] options = { "Confidentiality: "+server.params[0], "Integrity: "+server.params[1], "Availability: "+server.params[2], "Done" };
+                String[] options = { "Confidentiality: "+server.params[0], "Integrity: "+server.params[1], "Done" };
                 choice = JOptionPane.showOptionDialog(null, "Select server paramaters", "Options", 0,
                         JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
@@ -210,10 +190,6 @@ System.out.println("Encrypted:: "+msg);
                         else server.params[1] = true;
                         break;
                     case 2:
-                        if (server.params[2])server.params[2] = false;
-                        else server.params[2] = true;
-                        break;
-                    case 3:
                         choice = -1;
                         break;
                     default:
@@ -221,56 +197,55 @@ System.out.println("Encrypted:: "+msg);
                 }
             }
 
-            //Prompts user in commandline if they wish to have the server automatically generate responses
+            //Prompts user to say when they are ready. Gives the client time to be started before the server tries to find them
             Scanner s = new Scanner(System.in);
             System.out.println("You Ready?");
-
             String res = s.nextLine().toLowerCase().trim();
-            //if (res.compareTo("y") == 0) server.auto = true;
-            //else if (res.compareTo("n")==0) server.auto = false;
-            //while (!server.hasClient);
 
+            //searches for the client
             look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
 
+            //infite loop to wait for user imput
             while (true) {
-                //System.out.print("> ");
-
+                //reads user text in from the console
                 String text = s.nextLine().trim();
 
                 //If input message is '-Quit' then the client connection is terminated
                 if (text.compareTo("-Quit")==0) {
                     System.out.println("[System] Connection ended");
-                    break;
+                    return;
+                //Checks for commands to change security paramaters c -> confidentiality; i -> integrity; f -> false; t -> true
                 } else if (text.compareTo("-cf")==0) {
                     server.params[0] = false;
                     continue;
                 } else if (text.compareTo("-ct")==0) {
                     server.params[0] = true;
                     continue;
-                } /*else if (text.compareTo("-if")==0) {
+                } else if (text.compareTo("-if")==0) {
                     server.params[1] = false;
                     continue;
                 } else if (text.compareTo("-it")==0) {
                     server.params[1] = true;
                     continue;
-                } else if (text.compareTo("-af")==0) {
-                    server.params[2] = false;
-                    continue;
-                } else if (text.compareTo("-at")==0) {
-                    server.params[2] = true;
-                    continue;
-                }*/
+                }
+
 
                 //encrypts message typed by client
                 byte[] encoded = server.encryptFile(text);
+
+                //takes message and gets back a MAC for that message
+                String maced = server.MAC(text);
 
                 //System.out.println("[Message Encrypted] " + new String(encoded));
 
                 //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
                 //System.out.println("[Client "+server.name+":] " + server.decryptFile(look_up.Msg(encoded)));
 
-                if (server.params[0]) look_up.MsgENC(encoded);
-                else if (!server.params[0]) look_up.Msg(text);
+                //Sends a message to the client based on the desired security preferences
+                if (server.params[0] && server.params[1]) look_up.MsgINTENC(maced, encoded);
+                else if (server.params[0]) look_up.MsgENC(encoded);
+                else if (server.params[1]) look_up.MsgINT(maced, text);
+                else look_up.Msg(text);
 
             }
 
