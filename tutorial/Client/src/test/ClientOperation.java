@@ -114,6 +114,13 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         return new String(output);
     }
 
+    private void quit () throws NoSuchObjectException {
+        UnicastRemoteObject.unexportObject(this, false);
+
+
+        System.exit(1);
+    }
+
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
         Scanner s = new Scanner(System.in);
         //String realPass = "Rocket";
@@ -146,7 +153,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         }
 
         //only progresses in main if the correct password has been entered
-        if (pass.compareTo(realPass)!=0) return;
+        if (pass.compareTo(realPass)!=0) System.exit(1);
 
 
 
@@ -157,7 +164,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
         //Creates 'client server' for the server to find on ip //localhost/MyClient
         ClientOperation client = new ClientOperation();
-        Naming.rebind("//localhost/MyClient", client);
+        Naming.rebind("//localhost/"+name, client);
         System.out.println("[System] Client Ready");
 
         //Options menu for selection security options
@@ -184,6 +191,12 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             }
         }
 
+        boolean[] servParam = look_up.getParams();
+        if (client.params[0] != servParam[0] || client.params[1] != servParam[1]) {
+            System.out.println("[System] Wrong security options; Closing connection");
+            System.exit(1);
+        }
+
         //Infinite loop simply waits for client input to send to the server
         while (true) {
             String msg = s.nextLine().trim();
@@ -191,7 +204,8 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             //If input message is '-Quit' then the client connection is terminated
             if (msg.compareTo("-Quit")==0) {
                 System.out.println("[System] Connection ended");
-                return;
+                //System.exit(1);
+                client.quit();
              //Options for changing security options from the console
             } else if (msg.compareTo("-cf")==0) {
                 client.params[0] = false;
