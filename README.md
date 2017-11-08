@@ -1,9 +1,11 @@
 # Seng360Assign3
 Assignment 3 For Seng 360 Fall 2017
 
-First open all windows to the tutorial/Client/src folder and run 
+This Program uses 3 terminal windows.
 
-	rmiregistry <unused port>
+First open all windows to the tutorial/Client/src folder and run in the first
+
+	rmiregistry
 
 On one terminal window compile all files with the command 
 
