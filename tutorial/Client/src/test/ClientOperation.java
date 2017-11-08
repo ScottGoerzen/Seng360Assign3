@@ -199,7 +199,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             client.quit(look_up, client, name);
         }
 
-        String affirm = "[System] Client "+name+" has connected";
+        String affirm = "has connected";
         look_up.MsgINTENC(client.MAC(affirm) , encryptFile(affirm));
 
         //Infinite loop simply waits for client input to send to the server
