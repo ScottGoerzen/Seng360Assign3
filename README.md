@@ -22,14 +22,13 @@ On the last window run
 
 and enter a arbitrary Username and the password 'Rocket' to authenticate the user before selecting the desired security options.
 
-*Note that the server must be run first, and the client to follow before typing somthing into the server field to indicate readiness*
+*Note that the server must be run first, and the client to follow, but the client can be run at any time, and can recconect any number of times.*
 
-Next type a affirmative response into the Server console to indicate the Client is ready. -> this action serves to hold the server operation until the client has been established before trying to connect. 
-If this order is not followed, an error connecting to the client will arise.
 
 You can now type freely as the Client or Server to send messages to the other party.
 
-Security options can be changed by typing a '-' followed by a command into the input field.
+Security options can be changed by the server only when there is no client conected.
+This is done by typing a '-' followed by a command into the input field.
 
 Commands include:
 
@@ -40,6 +39,8 @@ Commands include:
 	-it 	: Integrity Checks enabled : Turns on checking of message integrity via message authentication codes (MAC)
 
 	-if 	: Integrity Checks disabled : Turns off checking of message integrity via message authentication codes (MAC)
+	-at	: Availability true : Turns on checking of real users via public/private key encryption
+	-af	: Availability false : Turns off checking of real users via public/private key encryption
 
 Both security options are enabled by default, but are selectable and set by the initiation sequence in the menu feature.
 

@@ -25,13 +25,13 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     private static Cipher cipher;
 
     private boolean[] params;
-    private static int numParams = 2;
+    private static int numParams = 3;
 
     protected ClientOperation () throws RemoteException {
         super();
 
         params = new boolean[numParams];
-        params[0] = true; params[1] = true;
+        params[0] = true; params[1] = true; params[2] = true;
     }
 
 
@@ -79,7 +79,6 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     //where the server decrypts, prints, and then either generatres and automatic response or waits for user input to respond.
     @Override
     public void MsgENC(byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-        Scanner s = new Scanner(System.in);
         //Incoming message is decrypted and printed to the terminal
         System.out.println("[Server] " + decryptFile(msg)+" [Confidential]");
     }
@@ -159,20 +158,15 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
 
 
-        //Authenticates with 'handshake' to server and gets a key for AES session key back
-        String algorithm = "AES";
-        secretKey = look_up.helloTo(name);
-        cipher = Cipher.getInstance(algorithm);
+
 
         //Creates 'client server' for the server to find on ip //localhost/MyClient
         ClientOperation client = new ClientOperation();
-        Naming.rebind("//localhost/MyClient", client);//+name, client);
-        System.out.println("[System] Client Ready");
 
         //Options menu for selection security options
         int choice = -2;
         while (choice != -1) {
-            String[] options = { "Confidentiality: "+client.params[0], "Integrity: "+client.params[1], "Done" };
+            String[] options = { "Confidentiality: "+client.params[0], "Integrity: "+client.params[1], "Availability: "+client.params[2], "Done" };
             choice = JOptionPane.showOptionDialog(null, "Select client paramaters", "Options", 0,
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
@@ -186,12 +180,26 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
                     else client.params[1] = true;
                     break;
                 case 2:
+                    if (client.params[2])client.params[2] = false;
+                    else client.params[2] = true;
+                    break;
+                case 3:
                     choice = -1;
                     break;
                 default:
                     break;
             }
         }
+
+        //Authenticates with 'handshake' to server and gets a key for AES session key back
+        String algorithm = "AES";
+        secretKey = look_up.helloTo(name);
+        cipher = Cipher.getInstance(algorithm);
+
+        Naming.rebind("//localhost/MyClient", client);//+name, client);
+        System.out.println("[System] Client Ready");
+
+
 
         boolean[] servParam = look_up.getParams();
         if (client.params[0] != servParam[0] || client.params[1] != servParam[1]) {
@@ -211,19 +219,6 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
                 System.out.println("[System] Connection ended");
                 //System.exit(1);
                 client.quit(look_up, client, name);
-             //Options for changing security options from the console
-            } else if (msg.compareTo("-cf")==0) {
-                client.params[0] = false;
-                continue;
-            } else if (msg.compareTo("-ct")==0) {
-                client.params[0] = true;
-                continue;
-            } else if (msg.compareTo("-if")==0) {
-                client.params[1] = false;
-                continue;
-            } else if (msg.compareTo("-it")==0) {
-                client.params[1] = true;
-                continue;
             }
 
 

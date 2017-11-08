@@ -22,7 +22,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     private boolean client;
 
     public boolean[] params;
-    private static int numParams = 2;
+    private static int numParams = 3;
 
     //AES crypto stuff
     private SecretKeySpec secretKey;
@@ -32,7 +32,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         super();
 
         params = new boolean[this.numParams];
-        params[0] = true; params[1] = true;
+        params[0] = true; params[1] = true; params[2] = true;
 
         client = false;
 
@@ -191,7 +191,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
             //Options menu for selection security options
             int choice = -2;
             while (choice != -1) {
-                String[] options = { "Confidentiality: "+server.params[0], "Integrity: "+server.params[1], "Done" };
+                String[] options = { "Confidentiality: "+server.params[0], "Integrity: "+server.params[1], "Availability: "+server.params[2], "Done" };
                 choice = JOptionPane.showOptionDialog(null, "Select server paramaters", "Options", 0,
                         JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
@@ -205,6 +205,10 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                         else server.params[1] = true;
                         break;
                     case 2:
+                        if (server.params[2])server.params[2] = false;
+                        else server.params[2] = true;
+                        break;
+                    case 3:
                         choice = -1;
                         break;
                     default:
@@ -226,18 +230,6 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                         System.out.println("[System] Connection ended");
                         System.exit(1);
                     //Checks for commands to change security paramaters c -> confidentiality; i -> integrity; f -> false; t -> true
-                    } else if (text.compareTo("-cf")==0) {
-                        server.params[0] = false;
-                        continue;
-                    } else if (text.compareTo("-ct")==0) {
-                        server.params[0] = true;
-                        continue;
-                    } else if (text.compareTo("-if")==0) {
-                        server.params[1] = false;
-                        continue;
-                    } else if (text.compareTo("-it")==0) {
-                        server.params[1] = true;
-                        continue;
                     }
 
 
@@ -262,6 +254,31 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                     else if (server.params[1]) look_up.MsgINT(maced, text);
                     else look_up.Msg(text);
                 } else {
+                    if (text.compareTo("-cf")==0) {
+                        server.params[0] = false;
+                        System.out.println("[System] Security options changed. Confidentiality: "+server.params[0]+", Integrity: "+server.params[1]+", Availability: "+server.params[2]);
+                        continue;
+                    } else if (text.compareTo("-ct")==0) {
+                        server.params[0] = true;
+                        System.out.println("[System] Security options changed. Confidentiality: "+server.params[0]+", Integrity: "+server.params[1]+", Availability: "+server.params[2]);
+                        continue;
+                    } else if (text.compareTo("-if")==0) {
+                        server.params[1] = false;
+                        System.out.println("[System] Security options changed. Confidentiality: "+server.params[0]+", Integrity: "+server.params[1]+", Availability: "+server.params[2]);
+                        continue;
+                    } else if (text.compareTo("-it")==0) {
+                        server.params[1] = true;
+                        System.out.println("[System] Security options changed. Confidentiality: "+server.params[0]+", Integrity: "+server.params[1]+", Availability: "+server.params[2]);
+                        continue;
+                    } else if (text.compareTo("-af")==0) {
+                        server.params[2] = false;
+                        System.out.println("[System] Security options changed. Confidentiality: "+server.params[0]+", Integrity: "+server.params[1]+", Availability: "+server.params[2]);
+                        continue;
+                    } else if (text.compareTo("-at")==0) {
+                        server.params[2] = true;
+                        System.out.println("[System] Security options changed. Confidentiality: "+server.params[0]+", Integrity: "+server.params[1]+", Availability: "+server.params[2]);
+                        continue;
+                    }
                     look_up = null;
                     System.out.println("[System] No Client connected. You have no friends. ;(");
                 }
