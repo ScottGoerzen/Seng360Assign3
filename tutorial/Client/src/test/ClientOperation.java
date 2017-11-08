@@ -114,8 +114,10 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         return new String(output);
     }
 
-    private void quit () throws NoSuchObjectException {
-        UnicastRemoteObject.unexportObject(this, false);
+    private void quit (RMIInterface server, RMICInterface client, String name) throws NoSuchObjectException, RemoteException {
+        server.RemoveClient(name);
+
+        UnicastRemoteObject.unexportObject(client, true);
 
 
         System.exit(1);
@@ -164,7 +166,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
         //Creates 'client server' for the server to find on ip //localhost/MyClient
         ClientOperation client = new ClientOperation();
-        Naming.rebind("//localhost/"+name, client);
+        Naming.rebind("//localhost/MyClient", client);//+name, client);
         System.out.println("[System] Client Ready");
 
         //Options menu for selection security options
@@ -194,8 +196,11 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         boolean[] servParam = look_up.getParams();
         if (client.params[0] != servParam[0] || client.params[1] != servParam[1]) {
             System.out.println("[System] Wrong security options; Closing connection");
-            System.exit(1);
+            client.quit(look_up, client, name);
         }
+
+        String affirm = "[System] Client "+name+" has connected";
+        look_up.MsgINTENC(client.MAC(affirm) , encryptFile(affirm));
 
         //Infinite loop simply waits for client input to send to the server
         while (true) {
@@ -205,7 +210,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             if (msg.compareTo("-Quit")==0) {
                 System.out.println("[System] Connection ended");
                 //System.exit(1);
-                client.quit();
+                client.quit(look_up, client, name);
              //Options for changing security options from the console
             } else if (msg.compareTo("-cf")==0) {
                 client.params[0] = false;

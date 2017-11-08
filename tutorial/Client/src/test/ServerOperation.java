@@ -145,6 +145,11 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         System.out.println("[Client: "+name+"] " + msg);
     }
 
+    public void RemoveClient(String name) throws RemoteException {
+        this.client = false;
+        System.out.println("[System] Client "+name+" has disconnected");
+    }
+
     public static void main(String[] args) {
         try {
 
@@ -209,27 +214,10 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
             //Prompts user to say when they are ready. Gives the client time to be started before the server tries to find them
             Scanner s = new Scanner(System.in);
-            //System.out.println("You Ready?");
-            String res = s.nextLine().toLowerCase().trim();
-            //searches for the client
-            /*while (!client) {
-System.out.println("o");
-                if (client) {
-                    System.out.println("Hey?");
-
-                    break;
-                }
-            }*/
-System.out.println("Client:: "+server.client);
-           // look_up = (RMICInterface) Naming.lookup("//localhost/"+server.name);
-            //look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
 
             //infinite loop to wait for user input
             while (true) {
-                //if (server.client==true) {
-//System.out.println("MEEEEOOOOOOOOOOOOOO");
-                //look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
-                    look_up = (RMICInterface) Naming.lookup("//localhost/"+server.name);
+
                     //reads user text in from the console
                     String text = s.nextLine().trim();
 
@@ -263,16 +251,20 @@ System.out.println("Client:: "+server.client);
                     //System.out.println("[Message Encrypted] " + new String(encoded));
 
                     //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
-                    //System.out.println("[Client "+server.name+":] " + server.decryptFile(look_up.Msg(encoded)));
+
+                if (server.client) {
+                    //look_up = (RMICInterface) Naming.lookup("//localhost/"+server.name);
+                    look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
 
                     //Sends a message to the client based on the desired security preferences
                     if (server.params[0] && server.params[1]) look_up.MsgINTENC(maced, encoded);
                     else if (server.params[0]) look_up.MsgENC(encoded);
                     else if (server.params[1]) look_up.MsgINT(maced, text);
                     else look_up.Msg(text);
-                //}
-
-                look_up = null;
+                } else {
+                    look_up = null;
+                    System.out.println("[System] No Client connected. You have no friends. ;(");
+                }
 
             }
 
