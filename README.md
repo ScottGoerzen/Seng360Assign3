@@ -53,3 +53,5 @@ All later encryption is done by AES encryption with the session key established 
 Hashing is done via the MD5 hashing scheme.
 
 Integrity is verified by means of passing a message authentication code (MAC)  along with the message. The MAC consists of the message being hashed with MD5, encrypted with AES and then converted back to a string. 
+
+Both client and server connections are ended and stoped by typing the -Quit command instead of a message into the command line. If the server quits with a client still conneted, it kicks the client out.
