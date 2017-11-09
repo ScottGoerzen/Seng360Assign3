@@ -104,13 +104,16 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 	@Override
     public SecretKeySpec helloTo(byte[] EncryptedName) throws RemoteException, NotBoundException, MalformedURLException {
 
-		PrivateKey privateKey = doRSA.getPrivateKey("/HiddenServer/privateServer.key");
+		PrivateKey privateKey = doRSA.getPrivateKey("test/HiddenServer/privateServer.key");
         String name = doRSA.decrypt(privateKey, EncryptedName);
 		
 		System.out.println(name + " is trying to contact!");
         this.name = name;
         client = true;
-
+		
+		PublicKey publicKey = doRSA.getPublicKey("test/public/publicClient.key");
+		//String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+		
         //Returns session key for AES encryption/decryption
         return secretKey;
 
