@@ -210,7 +210,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
 
         boolean[] servParam = look_up.getParams();
-        if (client.params[0] != servParam[0] || client.params[1] != servParam[1] || client.params[3] != servParam[2]) {
+        if (client.params[0] != servParam[0] || client.params[1] != servParam[1] || client.params[2] != servParam[2]) {
             System.out.println("[System] Wrong security options; Closing connection");
             client.quit(look_up, client, name);
         }
