@@ -227,7 +227,14 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
                     //If input message is '-Quit' then the client connection is terminated
                     if (text.compareTo("-Quit")==0) {
+                        if(server.client) {
+                            look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
+                            look_up.MsgENC(server.encryptFile("Shuting down. Connection closed"));
+                            look_up.quit(server, look_up, server.name);
+                            System.out.println("me");
+                        }
                         System.out.println("[System] Connection ended");
+                        s.close();
                         System.exit(1);
                     //Checks for commands to change security paramaters c -> confidentiality; i -> integrity; f -> false; t -> true
                     }

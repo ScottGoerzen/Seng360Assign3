@@ -24,11 +24,15 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     private static SecretKeySpec secretKey;
     private static Cipher cipher;
 
+    private boolean shutdown;
+
     private boolean[] params;
     private static int numParams = 3;
 
     protected ClientOperation () throws RemoteException {
         super();
+
+        shutdown = false;
 
         params = new boolean[numParams];
         params[0] = true; params[1] = true; params[2] = true;
@@ -84,9 +88,8 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     }
 
     @Override
-    public void Msg(String msg) {
+    public void Msg(String msg) throws RemoteException {
         System.out.println("[Server] " + msg);
-
     }
 
     //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
@@ -113,13 +116,11 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         return new String(output);
     }
 
-    private void quit (RMIInterface server, RMICInterface client, String name) throws NoSuchObjectException, RemoteException {
+    @Override
+    public void quit (RMIInterface server, RMICInterface client, String name) throws NoSuchObjectException, RemoteException {
         server.RemoveClient(name);
-
-        UnicastRemoteObject.unexportObject(client, true);
-
-
-        System.exit(1);
+        shutdown = true;
+        //UnicastRemoteObject.unexportObject(client, true);
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
@@ -141,13 +142,13 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         String pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password?"));
 
         int tries = 0;
+        ClientOperation client = new ClientOperation();
 
         while (pass.compareTo(realPass)!=0) {
             JOptionPane.showMessageDialog(null, "Wrong Password");
             if (tries > 4) {
-                System.out.println("[Server] Connection ended");
                 JOptionPane.showMessageDialog(null, "Groot is upset with you. Wrong Password!!!");
-                return;
+                client.quit(look_up, client, name);
             }
             pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining"));
             tries++;
@@ -161,7 +162,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
 
         //Creates 'client server' for the server to find on ip //localhost/MyClient
-        ClientOperation client = new ClientOperation();
+
 
         //Options menu for selection security options
         int choice = -2;
@@ -212,12 +213,15 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
         //Infinite loop simply waits for client input to send to the server
         while (true) {
+            if(client.shutdown) System.exit(1);
+
             String msg = s.nextLine().trim();
 
             //If input message is '-Quit' then the client connection is terminated
             if (msg.compareTo("-Quit")==0) {
                 System.out.println("[System] Connection ended");
                 //System.exit(1);
+                s.close();
                 client.quit(look_up, client, name);
             }
 
@@ -229,10 +233,12 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             String maced = client.MAC(msg);
 
             //sends message to the server with selected security properties
-            if (client.params[0] && client.params[1]) look_up.MsgINTENC(maced, encoded);
-            else if (client.params[0]) look_up.MsgENC(encoded, name);
-            else if (client.params[1]) look_up.MsgINT(maced, msg);
-            else look_up.Msg(msg);
+            if (!client.shutdown) {
+                if (client.params[0] && client.params[1]) look_up.MsgINTENC(maced, encoded);
+                else if (client.params[0]) look_up.MsgENC(encoded, name);
+                else if (client.params[1]) look_up.MsgINT(maced, msg);
+                else look_up.Msg(msg);
+            }
 
         }
 

@@ -13,4 +13,5 @@ public interface RMICInterface extends Remote {
     public void Msg (String msg) throws RemoteException;
     public void MsgINT (String mac, String msg) throws RemoteException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
     public void MsgINTENC (String mac, byte[] msg) throws RemoteException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
+    public void quit (RMIInterface server, RMICInterface client, String name) throws NoSuchObjectException, RemoteException;
 }
