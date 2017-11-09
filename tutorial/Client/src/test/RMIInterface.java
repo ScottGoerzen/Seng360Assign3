@@ -11,6 +11,7 @@ import java.security.InvalidKeyException;
 
 public interface RMIInterface extends Remote {
     public SecretKeySpec helloTo (String name) throws RemoteException, NotBoundException, MalformedURLException;
+	public SecretKeySpec helloTo (byte[] EncryptedName) throws RemoteException, NotBoundException, MalformedURLException;
     public void MsgENC (byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException;
     public void Msg (String msg) throws RemoteException;
     public boolean[] getParams () throws RemoteException;

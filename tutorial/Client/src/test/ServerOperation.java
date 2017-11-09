@@ -13,7 +13,7 @@ import test.RMIInterface;
 
 import javax.swing.*;
 
-
+import test.doRSA;
 
 public class ServerOperation extends UnicastRemoteObject implements RMIInterface {
     private static final long serialVersionUID = 1l;
@@ -91,6 +91,23 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     public SecretKeySpec helloTo(String name) throws RemoteException, NotBoundException, MalformedURLException {
 
         System.out.println(name + " is trying to contact!");
+        this.name = name;
+        client = true;
+
+        //Returns session key for AES encryption/decryption
+        return secretKey;
+
+    }
+	
+	//This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
+	//Encrypted Version
+	@Override
+    public SecretKeySpec helloTo(byte[] EncryptedName) throws RemoteException, NotBoundException, MalformedURLException {
+
+		PrivateKey privateKey = doRSA.getPrivateKey("/HiddenServer/privateServer.key");
+        String name = doRSA.decrypt(privateKey, EncryptedName);
+		
+		System.out.println(name + " is trying to contact!");
         this.name = name;
         client = true;
 
