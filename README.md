@@ -9,7 +9,7 @@ First open all windows to the tutorial/Client/src folder and run in the first
 
 On one terminal window compile all files with the command 
 
-	javac test/RMIInterface.java test/RMICInterface.java test/ClientOperation.java test/ServerOperation.java
+	javac test/RMIInterface.java test/RMICInterface.java test/ClientOperation.java test/ServerOperation.java test/doRSA.java
 
 On the same window run 
 
