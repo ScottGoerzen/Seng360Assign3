@@ -130,7 +130,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //Reads real password hash from an access controlled file and stores as realPass
         String realPass;
         MD5Hash hasher = new MD5Hash();
-        Scanner f = new Scanner(new File("test/ClientPassword.txt"));
+        Scanner f = new Scanner(new File("test/HiddenClient/ClientPassword.txt"));
         realPass = f.nextLine().trim();
 
         //Finds the server on the ip //localhost/MyServer

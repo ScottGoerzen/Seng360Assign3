@@ -158,7 +158,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
             //Reads hash of password from access controled file and stores it in the value realPass
             MD5Hash hasher = new MD5Hash();
-            Scanner f = new Scanner(new File("test/ServerPassword.txt"));
+            Scanner f = new Scanner(new File("test/HiddenServer/ServerPassword.txt"));
             realPass = f.nextLine().trim();
 
             //Prompts user loggin on for a password and hashes input
