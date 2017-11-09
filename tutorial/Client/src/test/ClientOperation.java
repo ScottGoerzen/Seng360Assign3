@@ -196,7 +196,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //Authenticates with 'handshake' to server and gets a key for AES session key back
         String algorithm = "AES";
         if (client.params[2]) { //if true use RSA Encryption for handshake
-			secretKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("/Public/publicServer.key"), name));
+			secretKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
 			System.out.println("//True");
 		} else {//otherwise pass key through plaintext
 			secretKey = look_up.helloTo(name);
