@@ -39,7 +39,9 @@ Commands include:
 	-it 	: Integrity Checks enabled : Turns on checking of message integrity via message authentication codes (MAC)
 
 	-if 	: Integrity Checks disabled : Turns off checking of message integrity via message authentication codes (MAC)
+
 	-at	: Availability true : Turns on checking of real users via public/private key encryption
+
 	-af	: Availability false : Turns off checking of real users via public/private key encryption
 
 Both security options are enabled by default, but are selectable and set by the initiation sequence in the menu feature.
