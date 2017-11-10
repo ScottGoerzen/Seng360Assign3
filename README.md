@@ -14,6 +14,7 @@ On one terminal window compile all files with the command
 On the same window run 
 
 	java GrootChat/ServerOperation
+
 and enter the password 'GROOT' before selecting the desired security options.
 
 On the last window run 
