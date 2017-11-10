@@ -168,7 +168,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //Options menu for selection security options
         int choice = -2;
         while (choice != -1) {
-            String[] options = { "Confidentiality: "+client.params[0], "Integrity: "+client.params[1], "Availability: "+client.params[2], "Done" };
+            String[] options = { "Confidentiality: "+client.params[0], "Integrity: "+client.params[1], "Authentication: "+client.params[2], "Done" };
             choice = JOptionPane.showOptionDialog(null, "Select client paramaters", "Options", 0,
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 

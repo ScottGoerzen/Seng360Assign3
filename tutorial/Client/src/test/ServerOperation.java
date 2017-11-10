@@ -212,7 +212,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
             //Options menu for selection security options
             int choice = -2;
             while (choice != -1) {
-                String[] options = { "Confidentiality: "+server.params[0], "Integrity: "+server.params[1], "Availability: "+server.params[2], "Done" };
+                String[] options = { "Confidentiality: "+server.params[0], "Integrity: "+server.params[1], "Authentication: "+server.params[2], "Done" };
                 choice = JOptionPane.showOptionDialog(null, "Select server paramaters", "Options", 0,
                         JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
