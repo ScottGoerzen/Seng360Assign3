@@ -193,7 +193,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                 if (tries > 4) {
                     System.out.println("[Server] Connection ended");
                     JOptionPane.showMessageDialog(null, "HOW COULD YOU OFFEND THE GALAXIES. Wrong Password!!!");
-                    return;
+                    System.exit(0);
                 }
                 pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining"));
                 tries++;
@@ -252,7 +252,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                             look_up = (RMICInterface) Naming.lookup("//localhost/MyClient");
                             look_up.MsgENC(server.encryptFile("Shuting down. Connection closed"));
                             look_up.quit(server, look_up, server.name);
-                            System.out.println("me");
+                            //System.out.println("me");
                         }
                         System.out.println("[System] Connection ended");
                         s.close();

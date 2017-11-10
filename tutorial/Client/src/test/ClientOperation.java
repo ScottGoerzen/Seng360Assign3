@@ -149,7 +149,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             JOptionPane.showMessageDialog(null, "Wrong Password");
             if (tries > 4) {
                 JOptionPane.showMessageDialog(null, "Groot is upset with you. Wrong Password!!!");
-                client.quit(look_up, client, name);
+                System.exit(0);
             }
             pass = hasher.md5Hash(JOptionPane.showInputDialog("What is your password? " + (5-tries) + " tries remaining"));
             tries++;
@@ -197,10 +197,10 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         String algorithm = "AES";
         if (client.params[2]) { //if true use RSA Encryption for handshake
 			secretKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
-			System.out.println("//True");
+			//System.out.println("//True");
 		} else {//otherwise pass key through plaintext
 			secretKey = look_up.helloTo(name);
-			System.out.println("//false");
+			//System.out.println("//false");
 		}
 		cipher = Cipher.getInstance(algorithm);
 
