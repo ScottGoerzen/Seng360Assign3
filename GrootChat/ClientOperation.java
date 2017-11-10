@@ -15,13 +15,18 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 
 public class ClientOperation extends UnicastRemoteObject implements RMICInterface {
-    private static final long serialVersionUID = 1l;
-    private static RMIInterface look_up;
+	
+	private static final long serialVersionUID = 1l;
+	
+    //to connect to the server
+	private static RMIInterface look_up;
+	//symmetric key
     private static SecretKeySpec secretKey;
+	//cipher for the jey
     private static Cipher cipher;
-
+	//if we should shutdown
     private boolean shutdown;
-
+	//confidentiality, integrity, authentication
     private boolean[] params;
     private static int numParams = 3;
 
@@ -29,12 +34,13 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         super();
 
         shutdown = false;
-
+		
+		//Assume we want to be secure
         params = new boolean[numParams];
         params[0] = true; params[1] = true; params[2] = true;
     }
 
-
+	//Unused but required to implement our interface 
     @Override
     public String helloTo(String name) throws RemoteException {
 
@@ -83,6 +89,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         System.out.println("[Server] " + decryptFile(msg)+" [Confidential]");
     }
 
+	//unencoded version
     @Override
     public void Msg(String msg) throws RemoteException {
         System.out.println("[Server] " + msg);
@@ -112,16 +119,15 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         return new String(output);
     }
 
+	//Quits and tells program to shutdown
     @Override
     public void quit (RMIInterface server, RMICInterface client, String name) throws NoSuchObjectException, RemoteException {
         server.RemoveClient(name);
         shutdown = true;
-        //UnicastRemoteObject.unexportObject(client, true);
     }
 
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
         Scanner s = new Scanner(System.in);
-        //String realPass = "Rocket";
 
         //Reads real password hash from an access controlled file and stores as realPass
         String realPass;
@@ -153,13 +159,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //only progresses in main if the correct password has been entered
         if (pass.compareTo(realPass)!=0) System.exit(1);
 
-
-
-
-
         //Creates 'client server' for the server to find on ip //localhost/MyClient
-
-
         //Options menu for selection security options
         int choice = -2;
         while (choice != -1) {
@@ -190,30 +190,38 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
 
         //Authenticates with 'handshake' to server and gets a key for AES session key back
         String algorithm = "AES";
-        if (client.params[2]) { //if true use RSA Encryption for handshake
-			//secretKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("GrootChat/Public/publicServer.key"), name));
-			//System.out.println("//True");
+		//if true use RSA Encryption for handshake
+        if (client.params[2]) {
+			
+			//pass the server our name, encrypted under the server public key
+			//get back the name we passed them to make sure they are who they say they are
+			//and also get a symmetric session key to use for future communications
 			Object[] returned = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("GrootChat/Public/publicServer.key"), name));
 			
+			//decrypt name and check if it matches
 			String returnedName = doRSA.decrypt(doRSA.getPrivateKey("GrootChat/HiddenClient/privateClient.key"), (byte[])returned[1]);
 			if (!name.equals(returnedName)) {
+				//if it does not match, quit
 				System.out.println("[System] Incorrect Expected Return; Closing connection");
 				client.quit(look_up, client, name);
 			}
 			
+			//if it does match, then decrypt the session key
 			byte[] encryptedKey = (byte[])returned[0]; 
 			String wild = doRSA.decrypt(doRSA.getPrivateKey("GrootChat/HiddenClient/privateClient.key"), encryptedKey);
 			secretKey = new SecretKeySpec(Base64.getDecoder().decode(wild), "AES");
+		
 		} else {//otherwise pass key through plaintext
 			secretKey = look_up.helloTo(name);
 		}
+		
+		//we are using AES for the session key
 		cipher = Cipher.getInstance(algorithm);
-
+		//bind to server
         Naming.rebind("//localhost/MyClient", client);//+name, client);
         System.out.println("[System] Client Ready");
 
-
-
+		//if security paramaters do not match, quit
         boolean[] servParam = look_up.getParams();
         if (client.params[0] != servParam[0] || client.params[1] != servParam[1] || client.params[2] != servParam[2]) {
             System.out.println("[System] Wrong security options; Closing connection");
