@@ -13,10 +13,15 @@ import javax.swing.*;
 
 public class ServerOperation extends UnicastRemoteObject implements RMIInterface {
     private static final long serialVersionUID = 1l;
-    private static RMICInterface look_up;
-    private String name;
-    private boolean client;
+    
+	//to connect to client
+	private static RMICInterface look_up;
+    //name passed by client
+	private String name;
+    //wether or not we are currently connected
+	private boolean client;
 
+	//confidentiality, integrity, authentication
     public boolean[] params;
     private static int numParams = 3;
 
@@ -24,14 +29,17 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     private SecretKeySpec secretKey;
     private Cipher cipher;
 
+	//constructor 
     protected ServerOperation(String secret, int length) throws RemoteException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException {
         super();
-
+		
+		//assume we want security
         params = new boolean[this.numParams];
         params[0] = true; params[1] = true; params[2] = true;
-
+		
         client = false;
 
+		//set up session key
         byte[] key = new byte[length];
         String algorithm = "AES";
         key = fixSecret(secret, length);
@@ -39,6 +47,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         this.cipher = Cipher.getInstance(algorithm);
     }
 
+	//to pass the client our paramaters
     public boolean[] getParams () throws RemoteException {
         return params;
     }
@@ -85,7 +94,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     @Override
     public SecretKeySpec helloTo(String name) throws RemoteException, NotBoundException, MalformedURLException {
 
-        System.out.println(name + " is trying to contact!");
+        System.out.println("[System] " + name + " is trying to contact!");
         this.name = name;
         client = true;
 
@@ -99,24 +108,29 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 	@Override
     public Object[] helloTo(byte[] EncryptedName) throws RemoteException, NotBoundException, MalformedURLException {
 
+		//to return two things
 		Object[] returner = new Object[2];
 	
+		//get private key from our hidden file
 		PrivateKey privateKey = doRSA.getPrivateKey("GrootChat/HiddenServer/privateServer.key");
-        String name = doRSA.decrypt(privateKey, EncryptedName);
+        //decrypt passed name
+		String name = doRSA.decrypt(privateKey, EncryptedName);
 		
+		//get client's public key
 		PublicKey publicKey = doRSA.getPublicKey("GrootChat/public/publicClient.key");
 		
+		//encrypt name to pass back for confirmation that we are who we claim to be
 		returner[1] = doRSA.encrypt(publicKey, name);
 		
-		System.out.println(name + " is trying to contact!");
+		System.out.println("[System] " + name + " is trying to contact!");
         this.name = name;
         client = true;
 		
+		//encrypt session key
 		String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-		
 		returner[0] = doRSA.encrypt(publicKey, encodedKey);
 		
-        //Returns session key for AES encryption/decryption
+        //Returns session key for AES encryption/decryption + encryped name
         return returner;
 
     }
@@ -153,8 +167,8 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
 
-    //This method is the main communication between client and server. The client calls this method to pass its msg to the server
-    //where the server decrypts, prints, and then either generatres and automatic response or waits for user input to respond.
+    //This method is the main communication between client and server. The client calls this method to pass its msg to the server.
+	//Encrypted Version
     @Override
     public void MsgENC(byte[] msg, String name) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Scanner s = new Scanner(System.in);
@@ -162,11 +176,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         System.out.println("[Client: "+name+"] " + decryptFile(msg)+" [Confidential]");
     }
 
+	//Unencryped Version, lame
     @Override
     public void Msg(String msg) {
         System.out.println("[Client: "+name+"] " + msg);
     }
-
+	
+	//removes client
     public void RemoveClient(String name) throws RemoteException {
         this.client = false;
         System.out.println("[System] Client "+name+" has disconnected");
@@ -175,7 +191,6 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     public static void main(String[] args) {
         try {
 
-            //String realPass = "GROOT";
             String realPass;
 
             //Reads hash of password from access controled file and stores it in the value realPass
@@ -207,8 +222,6 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
             ServerOperation server = new ServerOperation("!@#$MySecr3tPassw0rd", 16);
             Naming.rebind("//localhost/MyServer", server);
             System.out.println("[System] Server Ready");
-
-
 
             //Options menu for selection security options
             int choice = -2;
@@ -258,18 +271,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                         System.out.println("[System] Connection ended");
                         s.close();
                         System.exit(1);
-                    //Checks for commands to change security paramaters c -> confidentiality; i -> integrity; f -> false; t -> true
                     }
-
-
 
                     //encrypts message typed by client
                     byte[] encoded = server.encryptFile(text);
 
                     //takes message and gets back a MAC for that message
                     String maced = server.MAC(text);
-
-                    //System.out.println("[Message Encrypted] " + new String(encoded));
 
                     //sends encryped message to the server, gets back a response, decrypts and prints out the servers message
 
@@ -282,7 +290,9 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
                     else if (server.params[0]) look_up.MsgENC(encoded);
                     else if (server.params[1]) look_up.MsgINT(maced, text);
                     else look_up.Msg(text);
-                } else {
+					
+                //Checks for commands to change security paramaters c -> confidentiality; i -> integrity; f -> false; t -> true
+				} else {
                     if (text.compareTo("-cf")==0) {
                         server.params[0] = false;
                         System.out.println("[System] Security options changed. Confidentiality: "+server.params[0]+", Integrity: "+server.params[1]+", Availability: "+server.params[2]);
