@@ -56,4 +56,6 @@ All later encryption is done by AES encryption with the session key established 
 
 Hashing is done via the MD5 hashing scheme.
 
-Integrity is verified by means of passing a message authentication code (MAC)  along with the message. The MAC consists of the message being hashed with MD5, encrypted with AES and then converted back to a string. 
+Integrity is verified by means of passing a message authentication code (MAC)  along with the message. The MAC consists of the message being hashed with MD5, encrypted with AES and then converted back to a string.
+
+To explore the JavaDocs for our program, open index.html in the JavaDocs folder.
