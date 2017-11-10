@@ -8,6 +8,8 @@ import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
   
 public class doRSA {
+	
+	//main method only for testing
 	public static void main(String []args) throws Exception{
 		if (args.length == 1 && args[0].equals("1")) {
 			try {
@@ -21,10 +23,6 @@ public class doRSA {
 		}
 		
 		System.out.println("To generate keys call 'java doRSA 1'");
-		/*byte[] bytes = Files.readAllBytes(new File("public.key").toPath());
-		PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
-		bytes = Files.readAllBytes(new File("private.key").toPath());
-		PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(bytes));*/
 		
 		PublicKey publicKey = getPublicKey("public.key");
 		PrivateKey privateKey = getPrivateKey("private.key");
@@ -37,6 +35,7 @@ public class doRSA {
 		
     }
     
+	//fetches public key from path
 	public static PublicKey getPublicKey (String path) {
 		try {
 			byte[] bytes = Files.readAllBytes(new File(path).toPath());
@@ -48,6 +47,7 @@ public class doRSA {
 		return null;
 	}
 	
+	//fetches private key from path
 	public static PrivateKey getPrivateKey (String path) {
 		try {
 			byte[] bytes = Files.readAllBytes(new File(path).toPath());
@@ -59,25 +59,24 @@ public class doRSA {
 		return null;
 	}
 	
+	//generate keys
     public static void genKeys () throws Exception {
-		//KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
 
-		//KeyPair kp = kpg.genKeyPair();
-
+		//setup
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 		SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
 		keyGen.initialize(2048, random);
 
+		//generate
 		KeyPair pair = keyGen.generateKeyPair();
 		PrivateKey priv = pair.getPrivate();
 		PublicKey pub = pair.getPublic();
 
-  
+		//turns into byte array
 		byte[] publicKey = pub.getEncoded();
 		byte[] privateKey = priv.getEncoded();
 
-
-
+		//writes to files
 		FileOutputStream fos = new FileOutputStream("public.key");
 		fos.write(publicKey);
 		fos.close();
@@ -86,6 +85,7 @@ public class doRSA {
 		fos.close();
     }
    
+    //encrypts using private key
 	public static byte[] encrypt(PrivateKey privateKey, String message) {
 		
 		try {
@@ -103,6 +103,7 @@ public class doRSA {
 		 
     }
     
+	//decrypts using public key
     public static String decrypt(PublicKey publicKey, byte [] encrypted) {
 		
 		try {
@@ -118,6 +119,7 @@ public class doRSA {
 		return null;
     }
 	
+	//encrypts using public key
 	public static byte[] encrypt(PublicKey publicKey, String message) {
 		
 		try {
@@ -133,6 +135,7 @@ public class doRSA {
 		return null;
     }
     
+	//decrypts using private key
     public static String decrypt(PrivateKey privateKey, byte [] encrypted) {
 		
 		try {
