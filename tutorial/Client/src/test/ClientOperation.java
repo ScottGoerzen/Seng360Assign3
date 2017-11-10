@@ -198,13 +198,19 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         if (client.params[2]) { //if true use RSA Encryption for handshake
 			//secretKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
 			//System.out.println("//True");
+			Object[] returned = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
 			
-			byte[] encryptedKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
-			//secretKey =
-			//System.out.println("//True");
+			String returnedName = doRSA.decrypt(doRSA.getPrivateKey("test/HiddenClient/privateClient.key"), (byte[])returned[1]);
+			if (!name.equals(returnedName)) {
+				System.out.println("[System] Incorrect Expected Return; Closing connection");
+				client.quit(look_up, client, name);
+			}
+			
+			byte[] encryptedKey = (byte[])returned[0]; 
+			String wild = doRSA.decrypt(doRSA.getPrivateKey("test/HiddenClient/privateClient.key"), encryptedKey);
+			secretKey = new SecretKeySpec(Base64.getDecoder().decode(wild), "AES");
 		} else {//otherwise pass key through plaintext
 			secretKey = look_up.helloTo(name);
-			//System.out.println("//false");
 		}
 		cipher = Cipher.getInstance(algorithm);
 

@@ -85,7 +85,6 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
         return l;
     }
 
-
     //This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
     @Override
     public SecretKeySpec helloTo(String name) throws RemoteException, NotBoundException, MalformedURLException {
@@ -102,21 +101,27 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 	//This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
 	//Encrypted Version
 	@Override
-    public byte[] helloTo(byte[] EncryptedName) throws RemoteException, NotBoundException, MalformedURLException {
+    public Object[] helloTo(byte[] EncryptedName) throws RemoteException, NotBoundException, MalformedURLException {
 
+		Object[] returner = new Object[2];
+	
 		PrivateKey privateKey = doRSA.getPrivateKey("test/HiddenServer/privateServer.key");
         String name = doRSA.decrypt(privateKey, EncryptedName);
+		
+		PublicKey publicKey = doRSA.getPublicKey("test/public/publicClient.key");
+		
+		returner[1] = doRSA.encrypt(publicKey, name);
 		
 		System.out.println(name + " is trying to contact!");
         this.name = name;
         client = true;
 		
-		PublicKey publicKey = doRSA.getPublicKey("test/public/publicClient.key");
 		String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-		byte [] wild = doRSA.encrypt(publicKey, encodedKey);
+		
+		returner[0] = doRSA.encrypt(publicKey, encodedKey);
 		
         //Returns session key for AES encryption/decryption
-        return wild;
+        return returner;
 
     }
 
