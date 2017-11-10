@@ -225,7 +225,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
             String msg = s.nextLine().trim();
 
             //If input message is '-Quit' then the client connection is terminated
-            if (msg.compareTo("-Quit")==0) {
+            if (msg.compareTo("-Quit")==0 && !client.shutdown) {
                 System.out.println("[System] Connection ended");
                 //System.exit(1);
                 s.close();
