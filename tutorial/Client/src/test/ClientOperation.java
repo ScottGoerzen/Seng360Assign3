@@ -168,7 +168,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //Options menu for selection security options
         int choice = -2;
         while (choice != -1) {
-            String[] options = { "Confidentiality: "+client.params[0], "Integrity: "+client.params[1], "Availability: "+client.params[2], "Done" };
+            String[] options = { "Confidentiality: "+client.params[0], "Integrity: "+client.params[1], "Authentication: "+client.params[2], "Done" };
             choice = JOptionPane.showOptionDialog(null, "Select client paramaters", "Options", 0,
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
@@ -197,12 +197,19 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         String algorithm = "AES";
         if (client.params[2]) { //if true use RSA Encryption for handshake
 			
-			byte[] encryptedKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
-			//secretKey =
-			System.out.println("//True");
+			Object[] returned = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
+			
+			String returnedName = doRSA.decrypt(doRSA.getPrivateKey("test/HiddenClient/privateClient.key"), (byte[])returned[1]);
+			if (!name.equals(returnedName)) {
+				System.out.println("[System] Incorrect Expected Return; Closing connection");
+				client.quit(look_up, client, name);
+			}
+			
+			byte[] encryptedKey = (byte[])returned[0]; 
+			String wild = doRSA.decrypt(doRSA.getPrivateKey("test/HiddenClient/privateClient.key"), encryptedKey);
+			secretKey = new SecretKeySpec(Base64.getDecoder().decode(wild), "AES");
 		} else {//otherwise pass key through plaintext
 			secretKey = look_up.helloTo(name);
-			System.out.println("//false");
 		}
 		cipher = Cipher.getInstance(algorithm);
 
