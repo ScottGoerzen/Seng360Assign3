@@ -113,6 +113,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 		
 		PublicKey publicKey = doRSA.getPublicKey("test/public/publicClient.key");
 		String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+		byte [] wild = doRSA.encrypt(publicKey, encodedKey);
 		
         //Returns session key for AES encryption/decryption
         return secretKey;
