@@ -3,22 +3,23 @@ Assignment 3 For Seng 360 Fall 2017
 
 This Program uses 3 terminal windows.
 
-First open all windows to the tutorial/Client/src folder and run in the first
+First open all windows to the Seng360Assign3 folder and run in the first
 
 	rmiregistry
 
 On one terminal window compile all files with the command 
 
-	javac GrootChat/RMIInterface.java GrootChat/RMICInterface.java GrootChat/ClientOperation.java GrootChat/ServerOperation.java GrootChat/doRSA.java
+	javac GrootChat/RMIInterface.java GrootChat/RMICInterface.java GrootChat/ServerOperation.java GrootChat/ClientOperation.java
 
 On the same window run 
 
-	java test/ServerOperation
+	java GrootChat/ServerOperation
+
 and enter the password 'GROOT' before selecting the desired security options.
 
 On the last window run 
 
-	java test/ClientOperation 
+	java GrootChat/ClientOperation 
 
 and enter a arbitrary Username and the password 'Rocket' to authenticate the user before selecting the desired security options.
 
@@ -56,4 +57,4 @@ Hashing is done via the MD5 hashing scheme.
 
 Integrity is verified by means of passing a message authentication code (MAC)  along with the message. The MAC consists of the message being hashed with MD5, encrypted with AES and then converted back to a string. 
 
-Both client and server connections are ended and stoped by typing the -Quit command instead of a message into the command line. If the server quits with a client still conneted, it kicks the client out.
+Both client and server connections are ended and stopped by typing the -Quit command instead of a message into the command line. If the server quits with a client still connected, it kicks the client out.
