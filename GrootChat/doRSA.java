@@ -6,10 +6,17 @@ import java.io.*;
 import java.nio.file.Files;
 import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
-  
+
+/**
+ *
+ */
 public class doRSA {
-	
-	//main method only for testing
+
+	/**
+	 * @param args
+	 * @throws Exception
+	 * main method only for testing
+	 */
 	public static void main(String []args) throws Exception{
 		if (args.length == 1 && args[0].equals("1")) {
 			try {
@@ -34,8 +41,12 @@ public class doRSA {
 		
 		
     }
-    
-	//fetches public key from path
+
+    /**
+     * @param path Path the the file with public key
+     * @return
+     * fetches public key from path
+     */
 	public static PublicKey getPublicKey (String path) {
 		try {
 			byte[] bytes = Files.readAllBytes(new File(path).toPath());
@@ -46,8 +57,12 @@ public class doRSA {
 		}
 		return null;
 	}
-	
-	//fetches private key from path
+
+    /**
+     * @param path Path the the file with private key
+     * @return
+     * fetches private key from path
+     */
 	public static PrivateKey getPrivateKey (String path) {
 		try {
 			byte[] bytes = Files.readAllBytes(new File(path).toPath());
@@ -58,8 +73,11 @@ public class doRSA {
 		}
 		return null;
 	}
-	
-	//generate keys
+
+    /**
+     * @throws Exception
+     * generate keys
+     */
     public static void genKeys () throws Exception {
 
 		//setup
@@ -84,8 +102,13 @@ public class doRSA {
 		fos.write(privateKey);
 		fos.close();
     }
-   
-    //encrypts using private key
+
+    /**
+     * @param privateKey
+     * @param message
+     * @return
+     * encrypts using private key
+     */
 	public static byte[] encrypt(PrivateKey privateKey, String message) {
 		
 		try {
@@ -102,8 +125,13 @@ public class doRSA {
 		
 		 
     }
-    
-	//decrypts using public key
+
+    /**
+     * @param publicKey
+     * @param encrypted
+     * @return
+     * decrypts using public key
+     */
     public static String decrypt(PublicKey publicKey, byte [] encrypted) {
 		
 		try {
@@ -118,8 +146,13 @@ public class doRSA {
 		
 		return null;
     }
-	
-	//encrypts using public key
+
+    /**
+     * @param publicKey
+     * @param message
+     * @return
+     * encrypts using public key
+     */
 	public static byte[] encrypt(PublicKey publicKey, String message) {
 		
 		try {
@@ -134,8 +167,13 @@ public class doRSA {
 		
 		return null;
     }
-    
-	//decrypts using private key
+
+    /**
+     * @param privateKey
+     * @param encrypted
+     * @return
+     * decrypts using private key
+     */
     public static String decrypt(PrivateKey privateKey, byte [] encrypted) {
 		
 		try {

@@ -10,8 +10,12 @@ public class MD5Hash {
     public static void main(String[] args) {
         System.out.println(md5Hash(args[0]));
     }
- 
-    //converts to md5 hashed string
+
+    /**
+     * @param message
+     * @return
+     * converts to md5 hashed string
+     */
     public static String md5Hash(String message) {
         String md5 = "";
         if(null == message) 

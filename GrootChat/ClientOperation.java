@@ -30,6 +30,10 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
     private boolean[] params;
     private static int numParams = 3;
 
+    /**
+     * @throws RemoteException
+     * Constructor
+     */
     protected ClientOperation () throws RemoteException {
         super();
 
@@ -40,16 +44,15 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         params[0] = true; params[1] = true; params[2] = true;
     }
 
-	//Unused but required to implement our interface 
-    @Override
-    public String helloTo(String name) throws RemoteException {
-
-        System.out.println(name + " is trying to contact!");
-
-        return "hi";
-
-    }
-
+    /**
+     * @param msg takes in a string message
+     * @return returns a message authentication code for integrity checking
+     * @throws IOException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidKeyException
+     * Message authentication code generator. Takes in a string, hashes the string, encrypts, then converts that to a string.
+     */
     //Message authentication code generator. Takes in a string, hashes the string, encrypts, then converts that to a string.
     public String MAC(String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         MD5Hash hasher = new MD5Hash();
@@ -57,8 +60,16 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         return new String(encryptFile(msg));
     }
 
-    //Recieves a message with integrity checks. Runs the incoming msg through the MAC generator and compares the output to that of
-    //the MAC that was given by the message sender
+    /**
+     * @param mac takes in a message authentication code to compare for integrity
+     * @param msg takes in the message from the client
+     * @throws IOException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidKeyException
+     * Recieves a message with integrity checks. Runs the incoming msg through the MAC generator and compares the output to that of
+     * the MAC that was given by the message sender
+     */
     @Override
     public void MsgINT(String mac, String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         String verify = MAC(msg);
@@ -69,7 +80,15 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         }
     }
 
-    //Recieves a message with integrity checks and encryption for confidentiality. Decrypts message, then verifies integrity against MAC
+    /**
+     * @param mac takes in a message authentication code to compare for integrity
+     * @param msg takes in the encrypted message from the server
+     * @throws IOException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidKeyException
+     * Recieves a message with integrity checks and encryption for confidentiality. Decrypts message, then verifies integrity against MAC
+     */
     @Override
     public void MsgINTENC(String mac, byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         String text = decryptFile(msg);
@@ -81,23 +100,40 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         }
     }
 
-    //This method is the main communication between client and server. The client calls this method to pass its msg to the server
-    //where the server decrypts, prints, and then either generatres and automatic response or waits for user input to respond.
+    /**
+     * @param msg takes in the encrypted message from the server
+     * @throws IOException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws InvalidKeyException
+     * This method is the main communication between client and server. The server calls this method to pass its msg to the client.
+     * Encrypted Version
+     */
     @Override
     public void MsgENC(byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         //Incoming message is decrypted and printed to the terminal
         System.out.println("[Server] " + decryptFile(msg)+" [Confidential]");
     }
 
-	//unencoded version
+    /**
+     * @param msg takes in msg from the client
+     * Unencryped Version, lame
+     */
     @Override
     public void Msg(String msg) throws RemoteException {
         System.out.println("[Server] " + msg);
     }
 
-    //This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
+    /**
+     * @param s is a string that contains the message to encrypt
+     * @return A byte[] that contains the encrypted file
+     * @throws InvalidKeyException
+     * @throws IOException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
+     */
     public static byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
-        //System.out.println("Encrypting string: " + s);
         //Set Cipher to Encrypt mode in multi step encryption
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
@@ -107,7 +143,15 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         return output;
     }
 
-    //This method decrypts the passed in byte[] with AES symmetric key and returns the decrypted string
+    /**
+     * @param s is a byte[] that contains a message to decrypt
+     * @return A string that contains the decrpted message
+     * @throws InvalidKeyException
+     * @throws IOException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * This method decrypts the passed in byte[] with AES symmetric key and returns the decrypted string
+     */
     public static String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Decrypting string: " + s);
         //Set Cipher to Dercypt mode in multi step encryption
@@ -119,7 +163,14 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         return new String(output);
     }
 
-	//Quits and tells program to shutdown
+    /**
+     * @param server Takes in the server to send a quit message to
+     * @param client Takes in the client (itself)
+     * @param name brings in the name of the client to give to the server to say who is disconnecting
+     * @throws NoSuchObjectException
+     * @throws RemoteException
+     * Quits and tells program to shutdown
+     */
     @Override
     public void quit (RMIInterface server, RMICInterface client, String name) throws NoSuchObjectException, RemoteException {
         server.RemoveClient(name);
