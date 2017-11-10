@@ -6,15 +6,20 @@ import java.security.NoSuchAlgorithmException;
 public class MD5Hash {
   
     private final static String salt="^&*jgdaGYY65ad486gf65#44fashdgjkjkj668!^!^zfsduyifuidsf7773489";
-     
+
+
+    /**
+     * Useful if you want to hash from command line
+     * @param args the string to be hashed and printed to console
+     */
     public static void main(String[] args) {
         System.out.println(md5Hash(args[0]));
     }
 
     /**
-     * @param message
-     * @return
      * converts to md5 hashed string
+     * @param message message to be hashed
+     * @return hashed message
      */
     public static String md5Hash(String message) {
         String md5 = "";

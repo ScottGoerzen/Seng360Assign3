@@ -13,9 +13,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 public class doRSA {
 
 	/**
-	 * @param args
+     * main method only for testing
+	 * @param args pass in one argument to generate keys, otherwise, test keys
 	 * @throws Exception
-	 * main method only for testing
 	 */
 	public static void main(String []args) throws Exception{
 		if (args.length == 1 && args[0].equals("1")) {
@@ -43,9 +43,9 @@ public class doRSA {
     }
 
     /**
-     * @param path Path the the file with public key
-     * @return
      * fetches public key from path
+     * @param path Path the the file with public key
+     * @return requested public key
      */
 	public static PublicKey getPublicKey (String path) {
 		try {
@@ -59,9 +59,9 @@ public class doRSA {
 	}
 
     /**
-     * @param path Path the the file with private key
-     * @return
      * fetches private key from path
+     * @param path Path the the file with private key
+     * @return requested public key
      */
 	public static PrivateKey getPrivateKey (String path) {
 		try {
@@ -75,8 +75,8 @@ public class doRSA {
 	}
 
     /**
+     * Generate keys
      * @throws Exception
-     * generate keys
      */
     public static void genKeys () throws Exception {
 
@@ -104,10 +104,10 @@ public class doRSA {
     }
 
     /**
-     * @param privateKey
-     * @param message
-     * @return
-     * encrypts using private key
+     * encrypts using private key using RSA and the given key
+     * @param privateKey Private key used to encrypt
+     * @param message String to encrypt
+     * @return encrypted bytes
      */
 	public static byte[] encrypt(PrivateKey privateKey, String message) {
 		
@@ -127,10 +127,10 @@ public class doRSA {
     }
 
     /**
-     * @param publicKey
-     * @param encrypted
-     * @return
      * decrypts using public key
+     * @param publicKey the public key used to decrypt
+     * @param encrypted the encrypted bytes to decode
+     * @return the original message in string format
      */
     public static String decrypt(PublicKey publicKey, byte [] encrypted) {
 		
@@ -148,10 +148,10 @@ public class doRSA {
     }
 
     /**
-     * @param publicKey
-     * @param message
-     * @return
      * encrypts using public key
+     * @param publicKey The public key used to encrypt the message
+     * @param message The message to be encrypted
+     * @return The encrypted bytes
      */
 	public static byte[] encrypt(PublicKey publicKey, String message) {
 		
@@ -169,10 +169,10 @@ public class doRSA {
     }
 
     /**
-     * @param privateKey
-     * @param encrypted
-     * @return
      * decrypts using private key
+     * @param privateKey The private key used to decrypt
+     * @param encrypted The bytes to be decrypted
+     * @return The original message
      */
     public static String decrypt(PrivateKey privateKey, byte [] encrypted) {
 		

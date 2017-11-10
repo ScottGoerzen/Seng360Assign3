@@ -30,13 +30,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     private Cipher cipher;
 
     /**
-     * @param secret
-     * @param length
+     * constructor
+     * @param secret for generating session key
+     * @param length length for fixing key
      * @throws RemoteException
      * @throws UnsupportedEncodingException
      * @throws NoSuchAlgorithmException
      * @throws NoSuchPaddingException
-     * constructor
      */
 
     protected ServerOperation(String secret, int length) throws RemoteException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException {
@@ -57,20 +57,20 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
-     * @return
-     * @throws RemoteException
      * to pass the client our paramaters
+     * @return a boolean array representing our requested security parameters
+     * @throws RemoteException
      */
     public boolean[] getParams () throws RemoteException {
         return params;
     }
 
     /**
-     * @param s
-     * @param length
-     * @return
-     * @throws UnsupportedEncodingException
      * This method fixes the length of the key for AES encryption to the passed in length (16)
+     * @param s string to be fixed
+     * @param length length requested
+     * @return fixed byte array
+     * @throws UnsupportedEncodingException
      */
     private byte[] fixSecret(String s, int length) throws UnsupportedEncodingException {
         if (s.length() < length) {
@@ -83,13 +83,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
      * @param s is a string that contains the message to encrypt
      * @return A byte[] that contains the encrypted file
      * @throws InvalidKeyException
      * @throws IOException
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
-     * This method encrypts the passed in string with and AES symmetric key and returns the encrypted byte[]
      */
     private byte[] encryptFile(String s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Encrypting string: " + s);
@@ -103,13 +103,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * This method decrypts the passed in byte[] with AES symmetric key and returns the decrypted string
      * @param s is a byte[] that contains a message to decrypt
      * @return A string that contains the decrpted message
      * @throws InvalidKeyException
      * @throws IOException
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
-     * This method decrypts the passed in byte[] with AES symmetric key and returns the decrypted string
      */
     private String decryptFile(byte[] s) throws InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
         //System.out.println("Decrypting string: " + s);
@@ -126,12 +126,12 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
      * @param name The name of the client
      * @return returns the secret session key
      * @throws RemoteException
      * @throws NotBoundException
      * @throws MalformedURLException
-     * //This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
      */
     @Override
     public SecretKeySpec helloTo(String name) throws RemoteException, NotBoundException, MalformedURLException {
@@ -146,13 +146,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
+     * Encrypted Version
      * @param EncryptedName takes in the encrypted name from client to decrypt
      * @return Returns an object with the encrypted name and the session key, all encrypted with the clients public key
      * @throws RemoteException
      * @throws NotBoundException
      * @throws MalformedURLException
-     * This method is the inital 'handshake' when the client contacts the server, and the server returns the session key to the client
-     * Encrypted Version
      */
 	@Override
     public Object[] helloTo(byte[] EncryptedName) throws RemoteException, NotBoundException, MalformedURLException {
@@ -185,13 +185,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * Message authentication code generator. Takes in a string, hashes the string, encrypts, then converts that to a string.
      * @param msg takes in a string message
      * @return returns a message authentication code for integrity checking
      * @throws IOException
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
      * @throws InvalidKeyException
-     * Message authentication code generator. Takes in a string, hashes the string, encrypts, then converts that to a string.
      */
     public String MAC(String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         MD5Hash hasher = new MD5Hash();
@@ -200,14 +200,14 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * Recieves a message with integrity checks. Runs the incoming msg through the MAC generator and compares the output to that of
+     * the MAC that was given by the message sender
      * @param mac takes in a message authentication code to compare for integrity
      * @param msg takes in the message from the client
      * @throws IOException
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
      * @throws InvalidKeyException
-     * Recieves a message with integrity checks. Runs the incoming msg through the MAC generator and compares the output to that of
-     * the MAC that was given by the message sender
      */
     @Override
     public void MsgINT(String mac, String msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
@@ -220,13 +220,13 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * Recieves a message with integrity checks and encryption for confidentiality. Decrypts message, then verifies integrity against MAC
      * @param mac takes in a message authentication code to compare for integrity
      * @param msg takes in the encrypted message from the client
      * @throws IOException
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
      * @throws InvalidKeyException
-     * Recieves a message with integrity checks and encryption for confidentiality. Decrypts message, then verifies integrity against MAC
      */
     @Override
     public void MsgINTENC(String mac, byte[] msg) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
@@ -241,14 +241,14 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
 
     /**
+     * This method is the main communication between client and server. The client calls this method to pass its msg to the server.
+     * Encrypted Version
      * @param msg takes in name of client
      * @param name takes in encrypted message from client
      * @throws IOException
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
      * @throws InvalidKeyException
-     * This method is the main communication between client and server. The client calls this method to pass its msg to the server.
-     * Encrypted Version
      */
 
     @Override
@@ -259,8 +259,8 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
-     * @param msg takes in msg from the client
      * Unencryped Version, lame
+     * @param msg takes in msg from the client
      */
     @Override
     public void Msg(String msg) {
@@ -268,9 +268,9 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * removes client
      * @param name takes in name of client
      * @throws RemoteException
-     * removes client
      */
     public void RemoveClient(String name) throws RemoteException {
         this.client = false;
@@ -278,6 +278,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
     }
 
     /**
+     * Main Method, runs program.
      * @param args
      */
     public static void main(String[] args) {
