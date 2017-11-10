@@ -1,4 +1,4 @@
-package test;
+package GrootChat;
 
 import java.io.File;
 import java.io.*;
@@ -13,11 +13,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 
 import javax.swing.*;
-
-import test.RMIInterface;
-import test.RMICInterface;
-import test.MD5Hash;
-import test.doRSA;
 
 public class ClientOperation extends UnicastRemoteObject implements RMICInterface {
     private static final long serialVersionUID = 1l;
@@ -131,7 +126,7 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //Reads real password hash from an access controlled file and stores as realPass
         String realPass;
         MD5Hash hasher = new MD5Hash();
-        Scanner f = new Scanner(new File("test/HiddenClient/ClientPassword.txt"));
+        Scanner f = new Scanner(new File("GrootChat/HiddenClient/ClientPassword.txt"));
         realPass = f.nextLine().trim();
 
         //Finds the server on the ip //localhost/MyServer
@@ -196,18 +191,18 @@ public class ClientOperation extends UnicastRemoteObject implements RMICInterfac
         //Authenticates with 'handshake' to server and gets a key for AES session key back
         String algorithm = "AES";
         if (client.params[2]) { //if true use RSA Encryption for handshake
-			//secretKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
+			//secretKey = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("GrootChat/Public/publicServer.key"), name));
 			//System.out.println("//True");
-			Object[] returned = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("test/Public/publicServer.key"), name));
+			Object[] returned = look_up.helloTo(doRSA.encrypt(doRSA.getPublicKey("GrootChat/Public/publicServer.key"), name));
 			
-			String returnedName = doRSA.decrypt(doRSA.getPrivateKey("test/HiddenClient/privateClient.key"), (byte[])returned[1]);
+			String returnedName = doRSA.decrypt(doRSA.getPrivateKey("GrootChat/HiddenClient/privateClient.key"), (byte[])returned[1]);
 			if (!name.equals(returnedName)) {
 				System.out.println("[System] Incorrect Expected Return; Closing connection");
 				client.quit(look_up, client, name);
 			}
 			
 			byte[] encryptedKey = (byte[])returned[0]; 
-			String wild = doRSA.decrypt(doRSA.getPrivateKey("test/HiddenClient/privateClient.key"), encryptedKey);
+			String wild = doRSA.decrypt(doRSA.getPrivateKey("GrootChat/HiddenClient/privateClient.key"), encryptedKey);
 			secretKey = new SecretKeySpec(Base64.getDecoder().decode(wild), "AES");
 		} else {//otherwise pass key through plaintext
 			secretKey = look_up.helloTo(name);

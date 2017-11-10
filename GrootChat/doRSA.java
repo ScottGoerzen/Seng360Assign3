@@ -1,10 +1,8 @@
-package test;
+package GrootChat;
 
-import javax.crypto.spec.*;
 import java.security.*;
 import javax.crypto.*;
 import java.io.*;
-import java.nio.*;
 import java.nio.file.Files;
 import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;

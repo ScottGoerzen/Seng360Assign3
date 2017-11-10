@@ -1,4 +1,4 @@
-package test;
+package GrootChat;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -9,11 +9,7 @@ import java.security.*;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 
-import test.RMIInterface;
-
 import javax.swing.*;
-
-import test.doRSA;
 
 public class ServerOperation extends UnicastRemoteObject implements RMIInterface {
     private static final long serialVersionUID = 1l;
@@ -105,10 +101,10 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
 		Object[] returner = new Object[2];
 	
-		PrivateKey privateKey = doRSA.getPrivateKey("test/HiddenServer/privateServer.key");
+		PrivateKey privateKey = doRSA.getPrivateKey("GrootChat/HiddenServer/privateServer.key");
         String name = doRSA.decrypt(privateKey, EncryptedName);
 		
-		PublicKey publicKey = doRSA.getPublicKey("test/public/publicClient.key");
+		PublicKey publicKey = doRSA.getPublicKey("GrootChat/public/publicClient.key");
 		
 		returner[1] = doRSA.encrypt(publicKey, name);
 		
@@ -184,7 +180,7 @@ public class ServerOperation extends UnicastRemoteObject implements RMIInterface
 
             //Reads hash of password from access controled file and stores it in the value realPass
             MD5Hash hasher = new MD5Hash();
-            Scanner f = new Scanner(new File("test/HiddenServer/ServerPassword.txt"));
+            Scanner f = new Scanner(new File("GrootChat/HiddenServer/ServerPassword.txt"));
             realPass = f.nextLine().trim();
 
             //Prompts user loggin on for a password and hashes input

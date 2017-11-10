@@ -1,4 +1,4 @@
-package test;
+package GrootChat;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

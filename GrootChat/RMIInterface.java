@@ -1,4 +1,4 @@
-package test;
+package GrootChat;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
